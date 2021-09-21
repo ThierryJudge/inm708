@@ -218,20 +218,41 @@ if __name__ == '__main__':
               fond=(0, 0),
               window_size=25))
 
-    # 3.a
+    # 3
 
     image = img[:, :, 25]
-    filtered = gaussian_filter(im=image, s=1.25)
+    gaussian_filtered = gaussian_filter(im=image, s=0.65)
+    median_filtered = median_filter(im=image)
+    bil_filtered = bilateral_filter(im=image)
 
     fig = plt.figure(figsize=(10, 10))
 
-    fig.add_subplot(1, 3, 1)
+    fig.add_subplot(3, 3, 1)
     plt.imshow(image, cmap='gray')
+    plt.title("Original")
 
-    fig.add_subplot(1, 3, 2)
-    plt.imshow(filtered, cmap='gray')
+    fig.add_subplot(3, 3, 2)
+    plt.imshow(gaussian_filtered, cmap='gray')
+    plt.title("Gaussian filter")
 
-    fig.add_subplot(1, 3, 3)
-    plt.imshow(image - filtered, cmap='gray')
+    fig.add_subplot(3, 3, 3)
+    plt.imshow(image - gaussian_filtered, cmap='gray')
+    plt.title("Original - Gaussian filter")
+
+    fig.add_subplot(3, 3, 5)
+    plt.imshow(median_filtered, cmap='gray')
+    plt.title("Median filter")
+
+    fig.add_subplot(3, 3, 6)
+    plt.imshow(image - median_filtered, cmap='gray')
+    plt.title("Original - Median filter")
+
+    fig.add_subplot(3, 3, 8)
+    plt.imshow(bil_filtered, cmap='gray')
+    plt.title("Bilateral filter")
+
+    fig.add_subplot(3, 3, 9)
+    plt.imshow(image - bil_filtered, cmap='gray')
+    plt.title("Original - Bilateral filter")
 
     plt.show()

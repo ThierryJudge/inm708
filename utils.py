@@ -1,6 +1,7 @@
 import scipy
 import numpy as np
-
+from skimage.filters import median
+from skimage.restoration import denoise_bilateral
 
 def michelson_contrast(im):
     if im.ndim != 2:
@@ -52,6 +53,14 @@ def SNR(im, S, fond, window_size):
 
 def gaussian_filter(im, s):
     return scipy.ndimage.gaussian_filter(im, sigma=s)
+
+
+def median_filter(im):
+    return median(im)
+
+
+def bilateral_filter(im):
+    return denoise_bilateral(im)
 
 
 class bcolors:
