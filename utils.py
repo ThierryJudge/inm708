@@ -3,6 +3,7 @@ import numpy as np
 from skimage.filters import median
 from skimage.restoration import denoise_bilateral
 
+
 def michelson_contrast(im):
     if im.ndim != 2:
         raise Exception("Input must be a 2D image")
