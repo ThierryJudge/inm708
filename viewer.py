@@ -206,21 +206,21 @@ if __name__ == '__main__':
     # 2.b
     print(bcolors.WARNING + "Question 2.b" + bcolors.ENDC)
     print(bcolors.OKBLUE + "Michelson contrast" + bcolors.ENDC + ": ")
-    print(michelson_contrast(img[:, :, 25]))
+    print(michelson_contrast(img[:, :, 15]))
     print(bcolors.OKBLUE + "RMS contrast" + bcolors.ENDC + ": ")
-    print(rms_contrast(img[:, :, 25]))
+    print(rms_contrast(img[:, :, 15]))
 
     # 2.e
     print(bcolors.WARNING + "Question 2.e" + bcolors.ENDC)
     print(bcolors.OKBLUE + "SNR" + bcolors.ENDC + ": ")
-    print(SNR(im=img[:, :, 25],
+    print(SNR(im=img[:, :, 15],
               S=(0, 0),
               fond=(0, 0),
-              window_size=25))
+              window_size=5))
 
     # 3
 
-    image = img[:, :, 25]
+    image = img[:, :, 15]
     gaussian_filtered = gaussian_filter(im=image, s=0.65)
     median_filtered = median_filter(im=image)
     bil_filtered = bilateral_filter(im=image)

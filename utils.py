@@ -5,24 +5,33 @@ from skimage.restoration import denoise_bilateral
 
 
 def michelson_contrast(im):
-    if im.ndim != 2:
-        raise Exception("Input must be a 2D image")
+    if im.ndim != 2 or im.ndim != 3:
+        raise Exception("Input must be a 2D image or 3D volume")
 
     return (np.max(im) - np.min(im)) / (np.max(im) + np.max(im))
 
 
 def rms_contrast(im):
-    if im.ndim != 2:
-        raise Exception("Input must be a 2D image")
+    if im.ndim != 2 or im.ndim != 3:
+        raise Exception("Input must be a 2D image or 3D volume")
 
     it = 0
     m_ = np.mean(im)
 
-    for i in range(im.shape[0]):
-        for j in range(im.shape[1]):
-            it += (im[i][j] - m_) ** 2
+    if im.ndim == 2:
+        for i in range(im.shape[0]):
+            for j in range(im.shape[1]):
+                it += (im[i][j] - m_) ** 2
 
-    return np.sqrt(1 / (im.shape[0] * im.shape[1] - 1) * it)
+        return np.sqrt(1 / (im.shape[0] * im.shape[1] - 1) * it)
+
+    else:
+        for i in range(im.shape[0]):
+            for j in range(im.shape[1]):
+                for k in range(im.shape[2]):
+                    it += (im[i][j][k] - m_) ** 2
+
+        return np.sqrt(1 / (im.shape[0] * im.shape[1] * im.shape[2] - 1) * it)
 
 
 def SNR(im, S, fond, window_size):
