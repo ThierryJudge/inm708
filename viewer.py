@@ -4,9 +4,10 @@ import numpy as np
 from matplotlib.widgets import Slider, RadioButtons, RangeSlider
 from scipy import ndimage
 
+from utils import *
+
 
 class Viewer:
-
     PROJECTION_FUNCTIONS = {'MIP': np.max,
                             'mIP': np.min}
 
@@ -15,7 +16,6 @@ class Viewer:
               'axial': 'g'}
 
     def __init__(self, img, aspect=None, cmap='gray'):
-
         self.imshow_kwargs = {'cmap': cmap, 'aspect': aspect}
 
         axcolor = 'lightgoldenrodyellow'
@@ -25,11 +25,13 @@ class Viewer:
 
         img_sagittal = np.moveaxis(img, 0, 0)  # move n-th axis to front
         img_sagittal = img_sagittal.swapaxes(1, 2)
-        img_sagittal = ndimage.rotate(img_sagittal, 180, reshape=False, axes=(1, 2))
+        img_sagittal = ndimage.rotate(img_sagittal, 180, reshape=False,
+                                      axes=(1, 2))
 
         img_coronal = np.moveaxis(img, 1, 0)  # move n-th axis to front
         img_coronal = img_coronal.swapaxes(1, 2)
-        img_coronal = ndimage.rotate(img_coronal, 180, reshape=False, axes=(1, 2))
+        img_coronal = ndimage.rotate(img_coronal, 180, reshape=False,
+                                     axes=(1, 2))
 
         img_axial = np.moveaxis(img, 2, 0)  # move n-th axis to front
 
@@ -50,7 +52,9 @@ class Viewer:
         im_coronal = ax[1].imshow(img_coronal[cor_start], **self.imshow_kwargs)
         im_axial = ax[2].imshow(img_axial[ax_start], **self.imshow_kwargs)
 
-        self.im_proj = ax[3].imshow(self.proj_fn(self.img_proj[proj_start:proj_end], axis=0), **self.imshow_kwargs)
+        self.im_proj = ax[3].imshow(
+            self.proj_fn(self.img_proj[proj_start:proj_end], axis=0),
+            **self.imshow_kwargs)
 
         ax[0].set_title("Sagittal", color=self.COLORS['sagittal'])
         ax[1].set_title("Coronal", color=self.COLORS['coronal'])
@@ -60,23 +64,33 @@ class Viewer:
         # Setup Sliders
 
         ax_sagittal = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor=axcolor)
-        slider_sag = Slider(ax_sagittal, 'Sagittal', 0, img_sagittal.shape[0] - 1, valinit=sag_start, valstep=1)
+        slider_sag = Slider(ax_sagittal, 'Sagittal', 0,
+                            img_sagittal.shape[0] - 1, valinit=sag_start,
+                            valstep=1)
 
         ax_coronal = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
-        slider_cor = Slider(ax_coronal, 'Coronal', 0, img_coronal.shape[0] - 1, valinit=cor_start, valstep=1)
+        slider_cor = Slider(ax_coronal, 'Coronal', 0, img_coronal.shape[0] - 1,
+                            valinit=cor_start, valstep=1)
 
         ax_axial = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor=axcolor)
-        slider_ax = Slider(ax_axial, 'Axial', 0, img_axial.shape[0] - 1, valinit=ax_start, valstep=1)
+        slider_ax = Slider(ax_axial, 'Axial', 0, img_axial.shape[0] - 1,
+                           valinit=ax_start, valstep=1)
 
         # Setup lines
-        sagittal_coronal_line = ax[0].axvline(slider_cor.val, color=self.COLORS['coronal'])
-        sagittal_axial_line = ax[0].axhline(slider_ax.val, color=self.COLORS['axial'])
+        sagittal_coronal_line = ax[0].axvline(slider_cor.val,
+                                              color=self.COLORS['coronal'])
+        sagittal_axial_line = ax[0].axhline(slider_ax.val,
+                                            color=self.COLORS['axial'])
 
-        coronal_sagittal_line = ax[1].axvline(slider_sag.val, color=self.COLORS['sagittal'])
-        coronal_axial_line = ax[1].axhline(slider_ax.val, color=self.COLORS['axial'])
+        coronal_sagittal_line = ax[1].axvline(slider_sag.val,
+                                              color=self.COLORS['sagittal'])
+        coronal_axial_line = ax[1].axhline(slider_ax.val,
+                                           color=self.COLORS['axial'])
 
-        axial_sagittal_line = ax[2].axhline(slider_sag.val, color=self.COLORS['sagittal'])
-        axial_coronal_line = ax[2].axvline(slider_cor.val, color=self.COLORS['coronal'])
+        axial_sagittal_line = ax[2].axhline(slider_sag.val,
+                                            color=self.COLORS['sagittal'])
+        axial_coronal_line = ax[2].axvline(slider_cor.val,
+                                           color=self.COLORS['coronal'])
 
         def update(val=None):
             idx_sag = slider_sag.val
@@ -105,13 +119,15 @@ class Viewer:
 
         # Projection
         proj_ax = plt.axes([0.25, 0.2, 0.65, 0.03])
-        self.proj_slider = RangeSlider(proj_ax, "Projection", 0, self.img_proj.shape[0] - 1,
+        self.proj_slider = RangeSlider(proj_ax, "Projection", 0,
+                                       self.img_proj.shape[0] - 1,
                                        valinit=(proj_start, proj_end),
                                        valstep=1)
 
         def proj_update(val=None):
             val = self.proj_slider.val
-            self.im_proj.set_data(self.proj_fn(self.img_proj[val[0]:val[1]], axis=0))
+            self.im_proj.set_data(
+                self.proj_fn(self.img_proj[val[0]:val[1]], axis=0))
             fig.canvas.draw_idle()
 
         self.proj_slider.on_changed(proj_update)
@@ -129,7 +145,8 @@ class Viewer:
 
         # Projection img button
         rax_img = plt.axes([0.025, 0.2, 0.15, 0.15], facecolor=axcolor)
-        radio_img = RadioButtons(rax_img, ('Sagittal', 'Coronal', 'Axial'), active=2)
+        radio_img = RadioButtons(rax_img, ('Sagittal', 'Coronal', 'Axial'),
+                                 active=2)
 
         def set_proj_img(label):
             """Update function for projection selection button"""
@@ -141,7 +158,9 @@ class Viewer:
             self.proj_slider.valmax = self.img_proj.shape[0] - 1
             self.proj_slider.set_val((0, self.img_proj.shape[0] // 2))
 
-            self.im_proj = ax[3].imshow(self.proj_fn(self.img_proj[proj_start:proj_end], axis=0), **self.imshow_kwargs)
+            self.im_proj = ax[3].imshow(
+                self.proj_fn(self.img_proj[proj_start:proj_end], axis=0),
+                **self.imshow_kwargs)
 
             fig.canvas.draw_idle()
 
@@ -162,24 +181,57 @@ if __name__ == '__main__':
     print(file_data.header)
     img = file_data.get_fdata()
 
-    if img.ndim == 2:
-        plt.figure()
-        plt.imshow(img)
-        plt.show()
-    else:
-        Viewer(img)
+    # if img.ndim == 2:
+    #     plt.figure()
+    #     plt.imshow(img)
+    #     plt.show()
+    # else:
+    #     Viewer(img)
+    #
+    # print(img.shape)
 
-    print(img.shape)
+    # plt.figure()
+    # plt.hist(img.flatten(), bins=50)
+    #
+    # plt.figure()
+    # plt.hist(img[img > 30].flatten(), bins=50)
 
-    plt.figure()
-    plt.hist(img.flatten(), bins=50)
+    # if img.ndim == 2:
+    #     plt.figure()
+    #     plt.imshow(img)
+    #     plt.show()
+    # else:
+    #     Viewer(img)
 
-    plt.figure()
-    plt.hist(img[img > 30].flatten(), bins=50)
+    # 2.b
+    print(bcolors.WARNING + "Question 2.b" + bcolors.ENDC)
+    print(bcolors.OKBLUE + "Michelson contrast" + bcolors.ENDC + ": ")
+    print(michelson_contrast(img[:, :, 25]))
+    print(bcolors.OKBLUE + "RMS contrast" + bcolors.ENDC + ": ")
+    print(rms_contrast(img[:, :, 25]))
 
-    if img.ndim == 2:
-        plt.figure()
-        plt.imshow(img)
-        plt.show()
-    else:
-        Viewer(img)
+    # 2.e
+    print(bcolors.WARNING + "Question 2.e" + bcolors.ENDC)
+    print(bcolors.OKBLUE + "SNR" + bcolors.ENDC + ": ")
+    print(SNR(im=img[:, :, 25],
+              S=(0, 0),
+              fond=(0, 0),
+              window_size=25))
+
+    # 3.a
+
+    image = img[:, :, 25]
+    filtered = gaussian_filter(im=image, s=1.25)
+
+    fig = plt.figure(figsize=(10, 10))
+
+    fig.add_subplot(1, 3, 1)
+    plt.imshow(image, cmap='gray')
+
+    fig.add_subplot(1, 3, 2)
+    plt.imshow(filtered, cmap='gray')
+
+    fig.add_subplot(1, 3, 3)
+    plt.imshow(image - filtered, cmap='gray')
+
+    plt.show()
