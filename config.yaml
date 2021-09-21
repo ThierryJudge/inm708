@@ -17,8 +17,13 @@ t1:
             window_size: 10
 
     filter:
-         - gaussian
-
+         gaussian:
+            sigma: 0.65
+         nlmeans:
+            mask_value: 20
+            patch_radius: 1
+            block_radius: 1
+            rician: True
 
 flair:
     path: Data_MiseEnForme/Data_MiseEnForme/IRM/Brain/flair.nii
@@ -26,6 +31,15 @@ flair:
         aspect: null
         cmap: 'gray'
         rotate: True
+
+    filter:
+         gaussian:
+            sigma: 0.65
+         nlmeans:
+            mask_value: 20
+            patch_radius: 1
+            block_radius: 1
+            rician: True
 
 
 heart:

@@ -3,7 +3,8 @@ import numpy as np
 from skimage.filters import median
 from skimage.restoration import denoise_bilateral
 import operator
-
+from dipy.denoise.nlmeans import nlmeans
+from dipy.denoise.noise_estimate import estimate_sigma
 
 def michelson_contrast(im):
     return (np.max(im) - np.min(im)) / (np.max(im) + np.max(im))
@@ -36,11 +37,11 @@ def SNR(im, fg_coord, bg_coord, window_size):
     fg = cropND(im, fg_coord, window_size)
     bg = cropND(im, bg_coord, window_size)
 
-    return np.mean(fg)/np.std(bg)
+    return np.mean(fg)/ (np.std(bg) + 1e-8)
 
 
-def gaussian_filter(im, s):
-    return scipy.ndimage.gaussian_filter(im, sigma=s)
+def gaussian_filter(im, sigma):
+    return scipy.ndimage.gaussian_filter(im, sigma=sigma)
 
 
 def median_filter(im):
@@ -50,6 +51,15 @@ def median_filter(im):
 def bilateral_filter(im):
     return denoise_bilateral(im)
 
+
+def nlmeans_filter(im, mask_value, patch_radius=1, block_radius=1, rician=True):
+    mask = im > mask_value
+    sigma = estimate_sigma(im, N=0)
+
+    den = nlmeans(im, sigma=sigma, mask=mask, patch_radius=patch_radius,
+                  block_radius=block_radius, rician=rician)
+
+    return den
 
 class bcolors:
     HEADER = '\033[95m'
