@@ -1,0 +1,36 @@
+
+t1:
+    path: Data_MiseEnForme/Data_MiseEnForme/IRM/Brain/t1.nii
+    view_kwargs:
+        aspect: null
+        cmap: 'gray'
+        rotate: True
+
+    snr:
+        white_matter:
+            fg: [77, 161, 88]
+            bg: [166, 222, 88]
+            window_size: 10
+        gray_matter:
+            fg: [77, 161, 88]
+            bg: [166, 222, 88]
+            window_size: 10
+
+    filter:
+         - gaussian
+
+
+flair:
+    path: Data_MiseEnForme/Data_MiseEnForme/IRM/Brain/flair.nii
+    view_kwargs:
+        aspect: null
+        cmap: 'gray'
+        rotate: True
+
+
+heart:
+    path: Data_MiseEnForme/Data_MiseEnForme/IRM/Heart/PetitAxe/Slice06.nii
+    view_kwargs:
+        aspect: null
+        cmap: 'gray'
+        rotate: True

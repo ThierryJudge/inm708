@@ -15,7 +15,14 @@ class Viewer:
               'coronal': 'b',
               'axial': 'g'}
 
-    def __init__(self, img, aspect=None, cmap='gray'):
+    def __init__(self, img, aspect=None, cmap='gray', rotate=True):
+
+        if img.ndim == 2:
+            plt.figure()
+            plt.imshow(img)
+            plt.show()
+            return
+
         self.imshow_kwargs = {'cmap': cmap, 'aspect': aspect}
 
         axcolor = 'lightgoldenrodyellow'
@@ -23,17 +30,16 @@ class Viewer:
         fig, ax = plt.subplots(1, 4)
         plt.subplots_adjust(bottom=0.3, left=0.25)
 
-        img_sagittal = np.moveaxis(img, 0, 0)  # move n-th axis to front
-        img_sagittal = img_sagittal.swapaxes(1, 2)
-        img_sagittal = ndimage.rotate(img_sagittal, 180, reshape=False,
-                                      axes=(1, 2))
+        img_sagittal = np.moveaxis(img, 0, 0)
+        img_coronal = np.moveaxis(img, 1, 0)
+        img_axial = np.moveaxis(img, 2, 0)
 
-        img_coronal = np.moveaxis(img, 1, 0)  # move n-th axis to front
-        img_coronal = img_coronal.swapaxes(1, 2)
-        img_coronal = ndimage.rotate(img_coronal, 180, reshape=False,
-                                     axes=(1, 2))
+        if rotate:
+            img_sagittal = img_sagittal.swapaxes(1, 2)
+            img_sagittal = ndimage.rotate(img_sagittal, 180, reshape=False,axes=(1, 2))
 
-        img_axial = np.moveaxis(img, 2, 0)  # move n-th axis to front
+            img_coronal = img_coronal.swapaxes(1, 2)
+            img_coronal = ndimage.rotate(img_coronal, 180, reshape=False, axes=(1, 2))
 
         self.images = {'axial': img_axial,
                        'sagittal': img_sagittal,
@@ -52,9 +58,7 @@ class Viewer:
         im_coronal = ax[1].imshow(img_coronal[cor_start], **self.imshow_kwargs)
         im_axial = ax[2].imshow(img_axial[ax_start], **self.imshow_kwargs)
 
-        self.im_proj = ax[3].imshow(
-            self.proj_fn(self.img_proj[proj_start:proj_end], axis=0),
-            **self.imshow_kwargs)
+        self.im_proj = ax[3].imshow(self.proj_fn(self.img_proj[proj_start:proj_end], axis=0), **self.imshow_kwargs)
 
         ax[0].set_title("Sagittal", color=self.COLORS['sagittal'])
         ax[1].set_title("Coronal", color=self.COLORS['coronal'])
@@ -174,12 +178,19 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("file_path", type=str)
+    parser.add_argument("--aspect", type=str, choices=['auto'], default=None)
+    parser.add_argument("--cmap", type=str, choices=['gray'], default=None)
+    parser.add_argument("--no_rotate", dest='rotate', action='store_false')
     args = parser.parse_args()
 
     file_data = nib.load(args.file_path)
 
     print(file_data.header)
     img = file_data.get_fdata()
+
+    print(img.shape)
+
+    Viewer(img)
 
     # if img.ndim == 2:
     #     plt.figure()
@@ -203,56 +214,56 @@ if __name__ == '__main__':
     # else:
     #     Viewer(img)
 
-    # 2.b
-    print(bcolors.WARNING + "Question 2.b" + bcolors.ENDC)
-    print(bcolors.OKBLUE + "Michelson contrast" + bcolors.ENDC + ": ")
-    print(michelson_contrast(img[:, :, 15]))
-    print(bcolors.OKBLUE + "RMS contrast" + bcolors.ENDC + ": ")
-    print(rms_contrast(img[:, :, 15]))
-
-    # 2.e
-    print(bcolors.WARNING + "Question 2.e" + bcolors.ENDC)
-    print(bcolors.OKBLUE + "SNR" + bcolors.ENDC + ": ")
-    print(SNR(im=img[:, :, 15],
-              S=(0, 0),
-              fond=(0, 0),
-              window_size=5))
-
-    # 3
-
-    image = img[:, :, 15]
-    gaussian_filtered = gaussian_filter(im=image, s=0.65)
-    median_filtered = median_filter(im=image)
-    bil_filtered = bilateral_filter(im=image)
-
-    fig = plt.figure(figsize=(10, 10))
-
-    fig.add_subplot(3, 3, 1)
-    plt.imshow(image, cmap='gray')
-    plt.title("Original")
-
-    fig.add_subplot(3, 3, 2)
-    plt.imshow(gaussian_filtered, cmap='gray')
-    plt.title("Gaussian filter")
-
-    fig.add_subplot(3, 3, 3)
-    plt.imshow(image - gaussian_filtered, cmap='gray')
-    plt.title("Original - Gaussian filter")
-
-    fig.add_subplot(3, 3, 5)
-    plt.imshow(median_filtered, cmap='gray')
-    plt.title("Median filter")
-
-    fig.add_subplot(3, 3, 6)
-    plt.imshow(image - median_filtered, cmap='gray')
-    plt.title("Original - Median filter")
-
-    fig.add_subplot(3, 3, 8)
-    plt.imshow(bil_filtered, cmap='gray')
-    plt.title("Bilateral filter")
-
-    fig.add_subplot(3, 3, 9)
-    plt.imshow(image - bil_filtered, cmap='gray')
-    plt.title("Original - Bilateral filter")
-
-    plt.show()
+    # # 2.b
+    # print(bcolors.WARNING + "Question 2.b" + bcolors.ENDC)
+    # print(bcolors.OKBLUE + "Michelson contrast" + bcolors.ENDC + ": ")
+    # print(michelson_contrast(img[:, :, 15]))
+    # print(bcolors.OKBLUE + "RMS contrast" + bcolors.ENDC + ": ")
+    # print(rms_contrast(img[:, :, 15]))
+    #
+    # # 2.e
+    # print(bcolors.WARNING + "Question 2.e" + bcolors.ENDC)
+    # print(bcolors.OKBLUE + "SNR" + bcolors.ENDC + ": ")
+    # print(SNR(im=img[:, :, 15],
+    #           S=(0, 0),
+    #           fond=(0, 0),
+    #           window_size=5))
+    #
+    # # 3
+    #
+    # image = img[:, :, 15]
+    # gaussian_filtered = gaussian_filter(im=image, s=0.65)
+    # median_filtered = median_filter(im=image)
+    # bil_filtered = bilateral_filter(im=image)
+    #
+    # fig = plt.figure(figsize=(10, 10))
+    #
+    # fig.add_subplot(3, 3, 1)
+    # plt.imshow(image, cmap='gray')
+    # plt.title("Original")
+    #
+    # fig.add_subplot(3, 3, 2)
+    # plt.imshow(gaussian_filtered, cmap='gray')
+    # plt.title("Gaussian filter")
+    #
+    # fig.add_subplot(3, 3, 3)
+    # plt.imshow(image - gaussian_filtered, cmap='gray')
+    # plt.title("Original - Gaussian filter")
+    #
+    # fig.add_subplot(3, 3, 5)
+    # plt.imshow(median_filtered, cmap='gray')
+    # plt.title("Median filter")
+    #
+    # fig.add_subplot(3, 3, 6)
+    # plt.imshow(image - median_filtered, cmap='gray')
+    # plt.title("Original - Median filter")
+    #
+    # fig.add_subplot(3, 3, 8)
+    # plt.imshow(bil_filtered, cmap='gray')
+    # plt.title("Bilateral filter")
+    #
+    # fig.add_subplot(3, 3, 9)
+    # plt.imshow(image - bil_filtered, cmap='gray')
+    # plt.title("Original - Bilateral filter")
+    #
+    # plt.show()

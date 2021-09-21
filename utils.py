@@ -2,63 +2,41 @@ import scipy
 import numpy as np
 from skimage.filters import median
 from skimage.restoration import denoise_bilateral
+import operator
 
 
 def michelson_contrast(im):
-    if im.ndim != 2 or im.ndim != 3:
-        raise Exception("Input must be a 2D image or 3D volume")
-
     return (np.max(im) - np.min(im)) / (np.max(im) + np.max(im))
 
 
 def rms_contrast(im):
-    if im.ndim != 2 or im.ndim != 3:
-        raise Exception("Input must be a 2D image or 3D volume")
-
-    it = 0
-    m_ = np.mean(im)
-
-    if im.ndim == 2:
-        for i in range(im.shape[0]):
-            for j in range(im.shape[1]):
-                it += (im[i][j] - m_) ** 2
-
-        return np.sqrt(1 / (im.shape[0] * im.shape[1] - 1) * it)
-
-    else:
-        for i in range(im.shape[0]):
-            for j in range(im.shape[1]):
-                for k in range(im.shape[2]):
-                    it += (im[i][j][k] - m_) ** 2
-
-        return np.sqrt(1 / (im.shape[0] * im.shape[1] * im.shape[2] - 1) * it)
+    mean = np.mean(im)
+    return np.sqrt(1 / (np.prod(im.shape) - 1) * np.sum(np.square(im - mean)))
 
 
-def SNR(im, S, fond, window_size):
-    if im.ndim != 2:
-        raise Exception("Input must be a 2D image")
+def cropND(img, start, bounding):
+    """https://stackoverflow.com/questions/39382412/crop-center-portion-of-a-numpy-image"""
+    end = tuple(map(operator.add, start, np.repeat(bounding, img.ndim)))
+    slices = tuple(map(slice, start, end))
+    return img[slices]
 
-    if not isinstance(S, tuple) or len(S) != 2:
-        raise Exception("S window starting point must be defined as a tuple of "
-                        "len 2")
 
-    if not isinstance(fond, tuple) or len(fond) != 2:
-        raise Exception("fond window starting point must be defined as a tuple "
-                        "of len 2")
+def SNR(im, fg_coord, bg_coord, window_size):
+    assert len(fg_coord) == im.ndim, "FG window coordinates must be same lenght as image dimensions"
+    assert len(bg_coord) == im.ndim, "BG window coordinates must be same lenght as image dimensions"
 
-    if S[0] + window_size > im.shape[0] or\
-            S[1] + window_size > im.shape[1]:
-        raise Exception("Combination of window size and starting pixel of S "
-                        "exceed image dimension")
-    if fond[0] + window_size > im.shape[0] or\
-            fond[1] + window_size > im.shape[1]:
-        raise Exception("Combination of window size and starting pixel of "
-                        "\"fond\" exceed image dimension")
+    fg_coord = np.array(fg_coord)
+    bg_coord = np.array(bg_coord)
 
-    S_window = im[S[0]:S[0]+window_size, S[1]:S[1]+window_size]
-    fond_window = im[fond[0]:fond[0]+window_size, fond[1]:fond[1]+window_size]
+    assert not np.any((fg_coord + window_size) > im.shape), 'Window must be in image'
+    assert not np.any((bg_coord + window_size) > im.shape), 'Window must be in image'
+    assert not np.any(fg_coord < 0), 'Window must be in image'
+    assert not np.any(bg_coord < 0), 'Window must be in image'
 
-    return np.mean(S_window)/np.std(fond_window)
+    fg = cropND(im, fg_coord, window_size)
+    bg = cropND(im, bg_coord, window_size)
+
+    return np.mean(fg)/np.std(bg)
 
 
 def gaussian_filter(im, s):
