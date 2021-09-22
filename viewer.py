@@ -180,6 +180,7 @@ if __name__ == '__main__':
     parser.add_argument("file_path", type=str)
     parser.add_argument("--aspect", type=str, choices=['auto'], default=None)
     parser.add_argument("--cmap", type=str, choices=['gray'], default='gray')
+    parser.add_argument("--plot_hist", type=str, choices=['yes',' no'], default='no')
     parser.add_argument("--no_rotate", dest='rotate', action='store_false')
     args = parser.parse_args()
 
@@ -189,6 +190,14 @@ if __name__ == '__main__':
     print('Voxel size = ',file_data.header.get_zooms())
     print(file_data.header)
     img = file_data.get_fdata()
+
+    if args.plot_hist == "yes":
+
+        plt.figure()
+        plt.hist(img.flatten(), bins=50)
+
+        plt.figure()
+        plt.hist(img[img > 30].flatten(), bins=50)
 
     print(img.shape)
 
