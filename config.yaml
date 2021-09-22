@@ -20,10 +20,10 @@ t1:
          gaussian:
             sigma: 0.65
          nlmeans:
-            mask_value: 20
             patch_radius: 1
             block_radius: 1
             rician: True
+            mask_value: 20
          anisotropic_diffusion: {} # use defaults
 
 
