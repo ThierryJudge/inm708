@@ -186,7 +186,7 @@ if __name__ == '__main__':
     print(args)
 
     file_data = nib.load(args.file_path)
-
+    print('Voxel size = ',file_data.header.get_zooms())
     print(file_data.header)
     img = file_data.get_fdata()
 
