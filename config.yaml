@@ -8,11 +8,11 @@ t1:
 
     snr:
         white_matter:
-            fg: [77, 161, 88]
+            fg: [77, 97, 88]
             bg: [166, 222, 88]
             window_size: 10
         gray_matter:
-            fg: [77, 161, 88]
+            fg: [30, 97, 88]
             bg: [166, 222, 88]
             window_size: 10
 
@@ -24,6 +24,8 @@ t1:
             patch_radius: 1
             block_radius: 1
             rician: True
+         anisotropic_diffusion: {} # use defaults
+
 
 flair:
     path: Data_MiseEnForme/Data_MiseEnForme/IRM/Brain/flair.nii
@@ -32,6 +34,16 @@ flair:
         cmap: 'gray'
         rotate: True
 
+    snr:
+        white_matter:
+            fg: [67, 55, 11]
+            bg: [19, 231, 11]
+            window_size: 10
+        gray_matter:
+            fg: [46, 55, 11]
+            bg: [19, 231, 11]
+            window_size: 10
+
     filter:
          gaussian:
             sigma: 0.65
@@ -40,10 +52,25 @@ flair:
             patch_radius: 1
             block_radius: 1
             rician: True
+         anisotropic_diffusion: {} # use defaults
 
 
 heart:
     path: Data_MiseEnForme/Data_MiseEnForme/IRM/Heart/PetitAxe/Slice06.nii
+    view_kwargs:
+        aspect: null
+        cmap: 'gray'
+        rotate: True
+
+CT:
+    path: Data_MiseEnForme/Data_MiseEnForme/CT/rat111.nii
+    view_kwargs:
+        aspect: null
+        cmap: 'gray'
+        rotate: True
+
+CT:
+    path: Data_MiseEnForme/Data_MiseEnForme/Ultrasound/us.nii
     view_kwargs:
         aspect: null
         cmap: 'gray'
