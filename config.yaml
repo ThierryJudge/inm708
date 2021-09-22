@@ -69,7 +69,7 @@ CT:
         cmap: 'gray'
         rotate: True
 
-CT:
+US:
     path: Data_MiseEnForme/Data_MiseEnForme/Ultrasound/us.nii
     view_kwargs:
         aspect: null
