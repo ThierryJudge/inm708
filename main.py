@@ -19,7 +19,7 @@ for name, file_config in config.items():
     print(f"{name} at {file_config['path']}")
 
     file_data = nib.load(file_config['path'])
-    img = file_data.get_fdata()
+    img = file_data.get_fdata().squeeze()
 
     print(bcolors.WARNING + "Question 2.a" + bcolors.ENDC)
     print(f"Image size: {img.shape}")
