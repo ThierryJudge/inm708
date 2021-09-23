@@ -62,15 +62,15 @@ heart:
         cmap: 'gray'
         rotate: True
 
-   # snr:
-    #    white_matter:
-    #        fg: [169, 185, 7,10]    #y,x,z
-   #         bg: [69, 13, 7,100]
-    #        window_size: 10
-    #    gray_matter:
-    #        fg: [83, 138, 7,10]
-    #        bg: [69, 13, 7,100]
-    #        window_size: 10
+    snr:
+        white_matter:
+            fg: [169, 185, 7,10]    #y,x,z
+            bg: [69, 13, 7,100]
+            window_size: 10
+            gray_matter:
+            fg: [83, 138, 7,10]
+            bg: [69, 13, 7,100]
+            window_size: 10
 
   #  filter:
   #       gaussian:
@@ -90,15 +90,15 @@ CT:
         cmap: 'gray'
         rotate: True
 
-   # snr:
-    #    white_matter:
-    #        fg: [257, 223, 266]    #y,x,z
-    #        bg: [336, 26, 266]
-     #       window_size: 10
-     #   gray_matter:
-     #       fg: [120, 85, 266]
-     #       bg: [336, 26, 266]
-     #       window_size: 10
+    snr:
+        white_matter:
+            fg: [257, 223, 266]    #y,x,z
+            bg: [336, 26, 266]
+            window_size: 10
+            gray_matter:
+            fg: [120, 85, 266]
+            bg: [336, 26, 266]
+            window_size: 10
         
   #  filter:
    #      gaussian:
@@ -116,15 +116,15 @@ US:
         aspect: null
         cmap: 'gray'
         rotate: True
-  #  snr:
- #      white_matter:
-  #          fg: [216, 254, 185]    #y,x,z
-  #          bg: [45, 32, 185]
-   #         window_size: 10
-   #     gray_matter:
-   #         fg: [283, 151, 185]
-   #         bg: [45, 32, 185]
-   #         window_size: 10
+    snr:
+       white_matter:
+        fg: [216, 254, 185]    #y,x,z
+        bg: [45, 32, 185]
+        window_size: 10
+        gray_matter:
+        fg: [283, 151, 185]
+        bg: [45, 32, 185]
+        window_size: 10
         
    # filter:
   #       gaussian:
