@@ -72,6 +72,15 @@ heart:
             bg: [69, 13, 7,100]
             window_size: 10
 
+    filter:
+         gaussian:
+            sigma: 0.65
+         nlmeans:
+            mask_value: 20
+            patch_radius: 1
+            block_radius: 1
+            rician: True
+         anisotropic_diffusion: {} # use defaults
 
 
 CT:
@@ -90,6 +99,16 @@ CT:
             fg: [120, 85, 266]
             bg: [336, 26, 266]
             window_size: 10
+        
+    filter:
+         gaussian:
+            sigma: 0.65
+         nlmeans:
+            mask_value: 20
+            patch_radius: 1
+            block_radius: 1
+            rician: True
+         anisotropic_diffusion: {} # use defaults
 
 US:
     path: Data_MiseEnForme/Data_MiseEnForme/Ultrasound/us.nii
@@ -106,3 +125,13 @@ US:
             fg: [283, 151, 185]
             bg: [45, 32, 185]
             window_size: 10
+        
+    filter:
+         gaussian:
+            sigma: 0.65
+         nlmeans:
+            mask_value: 20
+            patch_radius: 1
+            block_radius: 1
+            rician: True
+         anisotropic_diffusion: {} # use defaults
