@@ -62,6 +62,18 @@ heart:
         cmap: 'gray'
         rotate: True
 
+    snr:
+        white_matter:
+            fg: [169, 185, 7]    #y,x,z
+            bg: [69, 13, 7]
+            window_size: 10
+        gray_matter:
+            fg: [83, 138, 7]
+            bg: [69, 13, 7]
+            window_size: 10
+
+
+
 CT:
     path: Data_MiseEnForme/Data_MiseEnForme/CT/rat111.nii
     view_kwargs:
@@ -69,9 +81,28 @@ CT:
         cmap: 'gray'
         rotate: True
 
+    snr:
+        white_matter:
+            fg: [257, 223, 266]    #y,x,z
+            bg: [336, 26, 266]
+            window_size: 10
+        gray_matter:
+            fg: [120, 85, 266]
+            bg: [336, 26, 266]
+            window_size: 10
+
 US:
     path: Data_MiseEnForme/Data_MiseEnForme/Ultrasound/us.nii
     view_kwargs:
         aspect: null
         cmap: 'gray'
         rotate: True
+    snr:
+        white_matter:
+            fg: [216, 254, 185]    #y,x,z
+            bg: [45, 32, 185]
+            window_size: 10
+        gray_matter:
+            fg: [283, 151, 185]
+            bg: [45, 32, 185]
+            window_size: 10
