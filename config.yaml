@@ -106,7 +106,7 @@ CT:
          nlmeans:
             mask_value: 20
             patch_radius: 1
-            block_radius: 
+            block_radius: 1
             rician: True
          anisotropic_diffusion: {} # use defaults
 
