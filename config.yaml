@@ -64,12 +64,12 @@ heart:
 
     snr:
         white_matter:
-            fg: [169, 185, 7]    #y,x,z
-            bg: [69, 13, 7]
+            fg: [169, 185, 7,1]    #y,x,z
+            bg: [69, 13, 7,1]
             window_size: 10
         gray_matter:
-            fg: [83, 138, 7]
-            bg: [69, 13, 7]
+            fg: [83, 138, 7,1]
+            bg: [69, 13, 7,1]
             window_size: 10
 
 
