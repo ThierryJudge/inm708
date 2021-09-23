@@ -15,16 +15,27 @@ t1:
             fg: [30, 97, 88]
             bg: [166, 222, 88]
             window_size: 10
+        white_matter/ventricle:
+          fg: [ 77, 97, 88 ]
+          bg: [ 83, 104, 101 ] # Ventricle
+          window_size: 10
+        gray_matter/ventricle:
+          fg: [ 30, 97, 88 ]
+          bg: [ 83, 104, 101 ] # Ventricle
+          window_size: 10
 
     filter:
          gaussian:
-            sigma: 0.65
+            sigma: 1
          nlmeans:
             patch_radius: 1
-            block_radius: 1
+            block_radius: 5
             rician: True
             mask_value: 20
-         anisotropic_diffusion: {} # use defaults
+         anisotropic_diffusion:
+             niter: 1
+             kappa: 50
+             gamma: 0.1
 
 
 flair:
@@ -43,17 +54,27 @@ flair:
             fg: [46, 55, 11]
             bg: [19, 231, 11]
             window_size: 10
+        white_matter/ventricle:
+          fg: [67, 55, 11]
+          bg: [ 92, 134, 11 ] # Ventricle
+          window_size: 10
+        gray_matter/ventricle:
+          fg: [46, 55, 11]
+          bg: [ 92, 134, 11 ] # Ventricle
+          window_size: 10
 
     filter:
          gaussian:
             sigma: 0.65
          nlmeans:
-            mask_value: 20
+            mask_value: 25
             patch_radius: 1
-            block_radius: 1
+            block_radius: 5
             rician: True
-         anisotropic_diffusion: {} # use defaults
-
+         anisotropic_diffusion:
+             niter: 3
+             kappa: 50
+             gamma: 0.1
 
 heart:
     path: Data_MiseEnForme/Data_MiseEnForme/IRM/Heart/PetitAxe/Slice06.nii

@@ -3,7 +3,7 @@ import nibabel as nib
 from utils import *
 from matplotlib import pyplot as plt
 from filters import *
-
+import time
 filters = {
     "gaussian": gaussian_filter,
     "bilateral": bilateral_filter,
@@ -19,7 +19,7 @@ for name, file_config in config.items():
     print(f"{name} at {file_config['path']}")
 
     file_data = nib.load(file_config['path'])
-    img = file_data.get_fdata()
+    img = file_data.get_fdata().squeeze()
 
     print(bcolors.WARNING + "Question 2.a" + bcolors.ENDC)
     print(f"Image size: {img.shape}")
@@ -62,7 +62,10 @@ for name, file_config in config.items():
 
         i = 2
         for filter_name, filter_config in file_config['filter'].items():
+            start = time.time()
             filtered = filters[filter_name](img, **filter_config)
+            end = time.time()
+            print(f"{filter_name} {end-start}")
             fig.add_subplot(nb_filters, 3, i)
             plt.imshow(filtered[:, :, slice], cmap='gray')
             plt.title(f"{filter_name}")
@@ -78,7 +81,8 @@ for name, file_config in config.items():
                 for snr_region, snr_config in file_config['snr'].items():
                     snr = SNR(filtered, snr_config['fg'], snr_config['bg'], snr_config['window_size'])
                     print(f"{filter_name} {snr_region} SNR {snr}")
+            print('-----')
 
         plt.savefig(f"{name}_filters.png")
 
-plt.show()
+# plt.show()

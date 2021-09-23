@@ -1,0 +1,8 @@
+pyyaml
+nibabel
+matplotlib
+scipy
+numpy
+scikit-image
+dipy
+medpy
