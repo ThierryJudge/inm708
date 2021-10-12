@@ -1,10 +1,9 @@
 import nibabel as nib
 from matplotlib import pyplot as plt
-import numpy as np
 from matplotlib.widgets import Slider, RadioButtons, RangeSlider
 from scipy import ndimage
 
-from utils import *
+from TP1.utils import *
 
 
 class Viewer:

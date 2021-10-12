@@ -1,8 +1,8 @@
 import yaml
 import nibabel as nib
-from utils import *
+from TP1.utils import *
 from matplotlib import pyplot as plt
-from filters import *
+from TP1.filters import *
 
 filters = {
     "gaussian": gaussian_filter,
