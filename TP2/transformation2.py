@@ -5,26 +5,12 @@ from matplotlib import pyplot as plt
 class Grid3D:
 
     def __init__(self):
-        """
-        Création de la grille
-
-        La grille a 4 dimensions et la première représente les coordonées
-        plus un 1.
-        in[1]:  g_[:, 7, 14, 3]
-        Out[1]: array([7., 14., 3., 1.])
-        """
 
         self.g_ = np.mgrid[-10:10, -10:10, 0:5]
         self.g_ = self.g_.reshape((3, -1)).T
         self.g_ = np.concatenate([self.g_, np.ones(len(self.g_))[:, None]],
                                  axis=1)
 
-        # self.g_ = np.mgrid[0:20, 0:20, 0:5]
-        # self.g_ = np.concatenate((self.g_,
-        #                          np.ones((1,
-        #                                   self.g_.shape[1],
-        #                                   self.g_.shape[2],
-        #                                   self.g_.shape[3]))))
         self.rotation_X = None
         self.rotation_Y = None
         self.rotation_Z = None
@@ -89,6 +75,14 @@ class Grid3D:
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("param", nargs='+', help='Parameters')
+    parser.add_argument("--transformation", type=str,
+                        help='rigide/similitude', default='rigide')
+    args = parser.parse_args()
+
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
@@ -96,25 +90,26 @@ if __name__ == '__main__':
 
     ax.scatter(grid.g_[:, 0], grid.g_[:, 1], grid.g_[:, 2], label='raw')
 
-    grid.trans_rigide(theta=0,
-                      omega=0,
-                      phi=45,
-                      p=0,
-                      q=0,
-                      r=0)
+    if args.transformation == 'rigide':
+        grid.trans_rigide(theta=float(args.param[1]),
+                          omega=float(args.param[2]),
+                          phi=float(args.param[3]),
+                          p=float(args.param[4]),
+                          q=float(args.param[5]),
+                          r=float(args.param[6]))
 
-    ax.scatter(grid.g_[:, 0], grid.g_[:, 1], grid.g_[:, 2], label='transformed')
+        ax.scatter(grid.g_[:, 0], grid.g_[:, 1], grid.g_[:, 2], label='transformed')
 
-    grid.__init__()
-    grid.similitude(d=0.75,
-                    theta=0,
-                    omega=0,
-                    phi=45,
-                    p=0,
-                    q=0,
-                    r=0)
+    elif args.transformation == 'similitude':
+        grid.similitude(d=float(args.param[0]),
+                        theta=float(args.param[1]),
+                        omega=float(args.param[2]),
+                        phi=float(args.param[3]),
+                        p=float(args.param[4]),
+                        q=float(args.param[5]),
+                        r=float(args.param[6]))
 
-    ax.scatter(grid.g_[:, 0], grid.g_[:, 1], grid.g_[:, 2], label='similituted')
+        ax.scatter(grid.g_[:, 0], grid.g_[:, 1], grid.g_[:, 2], label='similituted')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
