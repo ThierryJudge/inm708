@@ -13,10 +13,10 @@ $ pip install -r requirements.txt
 ### Question 1 - Histogramme conjoint
 
 Le fichier `histogram.py` peut prendre plusieurs arguments à l'appel:
-* {+ path +}: Chemin vers le dossier contenant les données (obligatoire)
-* --bins: Nombre de subdivisions dans l'histogramme
-* --log_scale: Affichage des données en logarithme
-* --remove_black: Retire les x% de pixels les plus sombres et affiche un second histogramme
+* **path**: Chemin vers le dossier contenant les données (obligatoire)
+* **--bins**: Nombre de subdivisions dans l'histogramme
+* **--log_scale**: Affichage des données en logarithme
+* **--remove_black**: Retire les x% de pixels les plus sombres et affiche un second histogramme
 
 Exemple de commande correcte:
 
@@ -39,8 +39,8 @@ IM:                           11.320345378217311
 ### Question 3 - Transformations spatiales
 
 Les fonctions et classe sont implémentées dans le fichier `transformation.py`. Les arguments sont:
-* param: Les paramètres des transformations. (Dans l'ordre [d, theta, omega, phi, p, q, r])
-* --transformation: Rigide ou similitude.
+* **param**: Les paramètres des transformations. (Dans l'ordre [d, theta, omega, phi, p, q, r])
+* **--transformation**: Rigide ou similitude.
 
 Par exemple:
 ````
