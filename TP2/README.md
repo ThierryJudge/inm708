@@ -44,5 +44,5 @@ Les fonctions et classe sont implémentées dans le fichier `transformation.py`.
 
 Par exemple:
 ````
-$python transformation2.py 0.5 45 45 45 0 0 0 --transformation similitude
+$ python transformation2.py 0.5 45 45 45 0 0 0 --transformation similitude
 ````
