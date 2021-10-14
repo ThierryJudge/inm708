@@ -21,5 +21,5 @@ Le fichier `histogram.py` peut prendre plusieurs arguments à l'appel:
 Exemple de commande correcte:
 
 ```
-$ python histogram.py Data_TP2/ --bins 50 --log_scale --remove_black
+$ python histogram.py Data_TP2/ --bins 50 --log_scale --remove_black 95
 ```
