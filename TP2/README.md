@@ -36,3 +36,13 @@ SSD:                          42510000
 Correlation:                  0.7802495447254987
 IM:                           11.320345378217311
 ````
+### Question 2 - Transformations spatiales
+
+Les fonctions et classe sont implémentées dans le fichier `transformation.py`. Les arguments sont:
+* param: Les paramètres des transformations. (Dans l'ordre [d, theta, omega, phi, p, q, r])
+* --transformation: Rigide ou similitude.
+
+Par exemple:
+````
+$python transformation2.py 0.5 45 45 45 0 0 0 --transformation similitude
+````
