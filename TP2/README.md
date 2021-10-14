@@ -10,7 +10,7 @@ $ pip install -r requirements.txt
 
 ## Utilisation
 
-#### Question 1 - Histogramme conjoint
+### Question 1 - Histogramme conjoint
 
 Le fichier `histogram.py` peut prendre plusieurs arguments à l'appel:
 * path: Chemin vers le dossier contenant les données (obligatoire)
