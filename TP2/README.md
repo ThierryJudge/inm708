@@ -13,7 +13,7 @@ $ pip install -r requirements.txt
 ### Question 1 - Histogramme conjoint
 
 Le fichier `histogram.py` peut prendre plusieurs arguments à l'appel:
-* path: Chemin vers le dossier contenant les données (obligatoire)
+* {+ path +}: Chemin vers le dossier contenant les données (obligatoire)
 * --bins: Nombre de subdivisions dans l'histogramme
 * --log_scale: Affichage des données en logarithme
 * --remove_black: Retire les x% de pixels les plus sombres et affiche un second histogramme
