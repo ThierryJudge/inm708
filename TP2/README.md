@@ -23,3 +23,16 @@ Exemple de commande correcte:
 ```
 $ python histogram.py Data_TP2/ --bins 50 --log_scale --remove_black 95
 ```
+
+### Question 2 - Critère de similarité
+
+Les différentes fonctions sont implémentées dans le fichier `similarity.py`. Celles-ci sont automatiquement appelées avec le fichier `histogram.py`et produisent un résultat dans le terminal. Par exemple:
+
+````
+Paire 6:
+Histogram sum:                381924.0
+Number of pixels:             381924
+SSD:                          42510000
+Correlation:                  0.7802495447254987
+IM:                           11.320345378217311
+````
