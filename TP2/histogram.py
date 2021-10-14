@@ -24,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument("--remove_black", type=int, help='Use seaborn?')
     args = parser.parse_args()
 
-    print( "\n" + bcolors.OKBLUE + "Informations: " + bcolors.ENDC + "\n")
+    print("\n" + bcolors.OKBLUE + "Informations: " + bcolors.ENDC)
 
     for i in range(1, 7):
         try:
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
         pretty_print("SSD:", ssd(I, J))
         pretty_print("Correlation:", cr(I, J))
-        pretty_print("MI:", mi(I, J, args.bins))
+        pretty_print("IM:", mi(I, J, args.bins))
 
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)

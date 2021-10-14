@@ -33,7 +33,7 @@ def rotate_z(theta):
                      ])
 
 
-def trans_rigide(theta, omega, phi, p, q, r):
+def trans_rigide(theta=0, omega=0, phi=0, p=0, q=0, r=0):
     Ax = rotate_x(theta)
     Ay = rotate_y(omega)
     Az = rotate_z(phi)
@@ -46,12 +46,16 @@ def trans_rigide(theta, omega, phi, p, q, r):
     return Ay @ Ax
 
 
+def similitude(s=0, theta=0, omega=0, phi=0, p=0, q=0, r=0):
+    return trans_rigide(theta, omega, phi, p, q, r) * s
+
+
 if __name__ == '__main__':
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
     X = generate_grid()
-    mat = trans_rigide(45., 45., 0., 2., 2., 1.)
+    mat = trans_rigide(0., 0., 45., 0., 0., 0.)
 
     print(X.shape)
     print(mat.shape)
