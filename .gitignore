@@ -1,5 +1,7 @@
 # Ignoring data
-/Data_TP1/
+Data_TP1/
+Data_TP2/
+/Data_MiseEnForme/
 
 poetry.lock
 

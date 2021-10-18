@@ -1,9 +1,9 @@
 import yaml
 import nibabel as nib
-from utils import *
+from TP1.utils import *
 from matplotlib import pyplot as plt
-from filters import *
-import time
+from TP1.filters import *
+
 filters = {
     "gaussian": gaussian_filter,
     "bilateral": bilateral_filter,
@@ -62,10 +62,7 @@ for name, file_config in config.items():
 
         i = 2
         for filter_name, filter_config in file_config['filter'].items():
-            start = time.time()
             filtered = filters[filter_name](img, **filter_config)
-            end = time.time()
-            print(f"{filter_name} {end-start}")
             fig.add_subplot(nb_filters, 3, i)
             plt.imshow(filtered[:, :, slice], cmap='gray')
             plt.title(f"{filter_name}")
@@ -81,8 +78,7 @@ for name, file_config in config.items():
                 for snr_region, snr_config in file_config['snr'].items():
                     snr = SNR(filtered, snr_config['fg'], snr_config['bg'], snr_config['window_size'])
                     print(f"{filter_name} {snr_region} SNR {snr}")
-            print('-----')
 
         plt.savefig(f"{name}_filters.png")
 
-# plt.show()
+plt.show()
