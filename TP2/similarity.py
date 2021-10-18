@@ -48,7 +48,7 @@ if __name__ == '__main__':
             I = imageio.imread(args.path / f'I{i}.jpg')
             J = imageio.imread(args.path / f'J{i}.jpg')
 
-    print(f'Paire {i}: SSD : {ssd(I, J)}, Corr.: {cr(I, J)}, MI: {mi(I, J, args.bins)}')
+        print(f'Paire {i}: SSD : {ssd(I, J)}, Corr.: {cr(I, J)}, MI: {mi(I, J, args.bins)}')
 
 
 
