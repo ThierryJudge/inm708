@@ -40,7 +40,7 @@ IM:                           11.320345378217311
 
 Les fonctions et classe sont implémentées dans le fichier `transformation.py`. Les arguments sont:
 * **param**: Les paramètres des transformations. (Dans l'ordre [d, theta, omega, phi, p, q, r])
-* **--transformation**: Rigide ou similitude.
+* **--transformation**: rigide ou similitude.
 
 Par exemple:
 ````
