@@ -9,7 +9,8 @@ def flatten_rem_black(im1, im2, n):
 
 
 def pretty_print(s, value):
-    print(s + (30-len(s))*" " + f"{value}")
+    print(s + (30 - len(s)) * " " + f"{value}")
+
 
 class bcolors:
     HEADER = '\033[95m'

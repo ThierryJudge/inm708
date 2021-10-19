@@ -23,10 +23,10 @@ def mi(i, j, bins=100):
     hist_norm = hist / np.sum(hist)
     px = np.sum(hist_norm, axis=1)
     py = np.sum(hist_norm, axis=0)
-    pxpy = px[None, :] * py[:, None]
+    pxpy = px[:, None] * py[None, :]
 
     indices = hist_norm > 0  # Only consider values that are over 0 to avoid NaN errors with log
-    return np.sum(hist_norm[indices] * np.log(hist_norm[indices] / pxpy[indices]))
+    return np.sum(hist_norm[indices] * (np.log(hist_norm[indices]) - np.log(pxpy[indices])))
 
     # return np.sum(hist_norm * np.log(hist_norm / pxpy))
 

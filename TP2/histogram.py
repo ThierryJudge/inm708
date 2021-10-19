@@ -46,6 +46,7 @@ if __name__ == '__main__':
 
         if args.log_scale:
             hist = np.log(hist)
+            hist[abs(hist) == np.inf] = 0
 
         pretty_print("SSD:", ssd(I, J))
         pretty_print("Correlation:", cr(I, J))

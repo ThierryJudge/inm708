@@ -1,4 +1,6 @@
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Tuple
 
 import imageio
 from scipy.ndimage import affine_transform
@@ -17,30 +19,54 @@ def translate(img, p, q):
     return affine_transform(img, mat)
 
 
+# class Optimizer:
+#     def __init__(self, eps: float):
+#         self.eps = eps
+#
+#     def step(self, variables: Sequence, grads: Sequence) -> Tuple:
+#         raise NotImplementedError
+#
+#
+# class GD(Optimizer):
+#
+#     def step(self, variables: np.ndarray, grads: np.ndarray) -> np.ndarray:
+#         variables = variables + self.eps * grads
+#         return variables
+#
+#
+# class GD_Momentum(Optimizer):
+#     def __init__(self, eps: float, momentum: float):
+#         super().__init__(eps)
+#         self.momentum = momentum
+#         self.v = None
+#
+#     def step(self, variables: np.ndarray, grads: np.ndarray) -> np.ndarray:
+#         if self.v is None:
+#             self.v = np.zeros(len(variables))
+#
+#         self.v = self.momentum * self.v + self.eps * g
+#         variables = variables + self.v
+#
+#         return variables
+
+
 def recalage_translation(i, j, iterations=500, eps=1e-9):
     errors = []
-    ps = []
-    qs = []
-    p = 1
-    q = 1
+    dps, dqs = [], []
+    ps, qs = [], []
+    p, q = 1, 1
     for _ in tqdm(range(iterations)):
-
-        # plt.figure()
-        # plt.imshow(dx)
-        # plt.figure()
-        # plt.imshow(dy)
-
-        i_trans = translate(i, p, q)
+        i_trans = translate(i, -p, -q)
         errors.append(ssd(i_trans, j))
 
-        dx = np.diff(i_trans, axis=1, prepend=0)
-        dy = np.diff(i_trans, axis=0, prepend=0)
+        # dx = np.diff(i_trans, axis=0, prepend=0)
+        # dy = np.diff(i_trans, axis=1, prepend=0)
 
-        # dx = np.gradient(i_trans, axis=1)
-        # dy = np.gradient(i_trans, axis=0)
+        dx = np.gradient(i_trans, axis=0)
+        dy = np.gradient(i_trans, axis=1)
 
-        dx = translate(dx, p, q)
-        dy = translate(dy, p, q)
+        # dx = translate(dx, p, q)
+        # dy = translate(dy, p, q)
 
         dp = 2 * np.sum((i_trans - j) * dx)
         dq = 2 * np.sum((i_trans - j) * dy)
@@ -50,8 +76,11 @@ def recalage_translation(i, j, iterations=500, eps=1e-9):
 
         p -= eps * dp
         q -= eps * dq
+
         ps.append(p)
         qs.append(q)
+        dps.append(dp)
+        dqs.append(dq)
 
         # plt.figure()
         # plt.imshow(i_trans - i)
@@ -62,6 +91,10 @@ def recalage_translation(i, j, iterations=500, eps=1e-9):
     plt.figure()
     plt.plot(ps)
     plt.plot(qs)
+
+    plt.figure()
+    plt.plot(dps)
+    plt.plot(dqs)
 
     return p, q, errors
 
@@ -85,12 +118,9 @@ if __name__ == '__main__':
     I = imageio.imread(args.path)
     I2 = translate(I, 20, 10)
 
-    p, q, errors = recalage_translation(I2, I, 500, eps=1e-7)
-
-    print(p,q)
+    p, q, errors = recalage_translation(I2, I, 1000, eps=1e-8)
 
     I3 = translate(I2, -p, -q)
-
 
     plt.figure()
     plt.plot(errors)
