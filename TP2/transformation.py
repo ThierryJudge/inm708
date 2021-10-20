@@ -102,7 +102,7 @@ if __name__ == '__main__':
                           q=float(args.param[5]),
                           r=float(args.param[6]))
 
-        ax.scatter(grid.g_[0, :], grid.g_[1, :], grid.g_[2, :], label='transformed')
+        ax.scatter(grid.g_[0, :], grid.g_[1, :], grid.g_[2, :], label='rigid')
 
     elif args.transformation == 'similitude':
         grid.similitude(d=float(args.param[0]),
@@ -113,7 +113,7 @@ if __name__ == '__main__':
                         q=float(args.param[5]),
                         r=float(args.param[6]))
 
-        ax.scatter(grid.g_[0, :], grid.g_[1, :], grid.g_[2, :], label='similituted')
+        ax.scatter(grid.g_[0, :], grid.g_[1, :], grid.g_[2, :], label='similitude')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')

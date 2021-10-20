@@ -25,8 +25,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     print("\n" + bcolors.OKBLUE + "Informations: " + bcolors.ENDC)
+    
+    num_images = 6
+    figure, axes = plt.subplots(num_images, 3)
 
-    for i in range(1, 7):
+    for i in range(1, num_images+1):
         try:
             I = imageio.imread(args.path / f'I{i}.png')
             J = imageio.imread(args.path / f'J{i}.png')
@@ -52,6 +55,12 @@ if __name__ == '__main__':
         pretty_print("Correlation:", cr(I, J))
         pretty_print("IM:", mi(I, J, args.bins))
 
+        axes[i-1, 0].imshow(I)
+        axes[i-1, 0].set_title(f"I{i}")
+        axes[i-1, 1].imshow(J)
+        axes[i-1, 1].set_title(f"J{i}")
+        axes[i-1, 2].imshow(hist, origin='lower')
+        axes[i-1, 2].set_title("H")
 
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
         ax1.imshow(I)
@@ -70,4 +79,5 @@ if __name__ == '__main__':
                           kind="hex", color="#4CB391",
                           marginal_kws=dict(bins=args.bins,
                                             fill=True))
-        plt.show()
+
+    plt.show()

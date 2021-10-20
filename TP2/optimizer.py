@@ -46,6 +46,9 @@ class GradientDescent(Optimizer):
 
         return variables
 
+    def to_string(self):
+        return f"{self.__class__.__name__}-eps={self.eps}-mom={self.momentum}"
+
 
 class Adam(Optimizer):
     def __init__(self, eps, beta1=0.9, beta2=0.999, epsilon=1e-8):
@@ -67,4 +70,9 @@ class Adam(Optimizer):
 
         variables = variables - self.eps * (m_corr / (np.sqrt(v_corr) + self.epsilon))
 
+        self.t += 1
+
         return variables
+
+    def to_string(self):
+        return f"{self.__class__.__name__}-eps={self.eps}"
