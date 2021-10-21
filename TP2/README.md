@@ -54,7 +54,6 @@ $ python transformation2.py 0.5 45 45 45 0 0 0 --transformation similitude
 #### Transformation 
 
 Le fichier ``recalage.py`` implémente les fonctions nécesaire pour le recalage d'une translation, rotation et transformation rigide.
-Il es
 
 
 #### Comparaison d'algorithme d'optimisation
