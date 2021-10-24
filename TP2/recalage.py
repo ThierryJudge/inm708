@@ -42,8 +42,8 @@ def recalage_rotation(i, j, optimizer: Optimizer, iterations=500):
         dx = np.gradient(i_trans, axis=0)
         dy = np.gradient(i_trans, axis=1)
 
-        x = np.arange(j.shape[0])
-        y = np.arange(j.shape[1])
+        x = np.repeat(np.arange(j.shape[0])[None], j.shape[1], axis=0)
+        y = np.repeat(np.arange(j.shape[1])[:, None], j.shape[0], axis=1)
         sin = np.sin(variables[0])
         cos = np.cos(variables[0])
         dtheta = 2 * np.sum((i_trans - j) * (dx * (-x * sin - y * cos) + dy * (x * cos - y * sin)))
@@ -67,8 +67,9 @@ def recalage_rigide(i, j, optimizer: Optimizer, iterations=500):
         dx = np.gradient(i_trans, axis=0)
         dy = np.gradient(i_trans, axis=1)
 
-        x = np.arange(j.shape[0])
-        y = np.arange(j.shape[1])
+        x = np.repeat(np.arange(j.shape[0])[None], j.shape[1], axis=0)
+        y = np.repeat(np.arange(j.shape[1])[:, None], j.shape[0], axis=1)
+
         sin = np.sin(variables[2])
         cos = np.cos(variables[2])
         dtheta = 2 * np.sum((i_trans - j) * (dx * (-x * sin - y * cos) + dy * (x * cos - y * sin)))
@@ -109,6 +110,9 @@ def rigid(img, p, q, theta):
 if __name__ == '__main__':
     import argparse
 
+    random.seed(0)
+    np.random.seed(0)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("path", type=Path, help='Path to input image')
     parser.add_argument("transform", type=str, help='Type of transform', choices=['translation', 'rotation', 'rigid'],
@@ -145,6 +149,7 @@ if __name__ == '__main__':
             I2 = translate(I, p, q)
 
             variables, errors = recalage_translation(I2, I, optim, args.steps)
+            variables = optim.variable_history[np.argmin(errors)]
 
             I3 = translate(I2, -variables[0], -variables[1])
 
@@ -153,7 +158,7 @@ if __name__ == '__main__':
 
         elif args.transform == 'rotation':
             names = ['theta']
-            optim = GradientDescent(eps=1e-10)
+            optim = GradientDescent(eps=1e-12)
 
             theta = random.uniform(rotation_range[0], rotation_range[1])
 
@@ -161,6 +166,8 @@ if __name__ == '__main__':
 
             variables, errors = recalage_rotation(I2, I, optim, args.steps)
             I3 = rotate(I2, -variables[0])
+
+            variables = optim.variable_history[np.argmin(errors)]
 
             print(f"Real values: theta={np.rad2deg(theta)}")
             print(f"Computed values: theta={np.rad2deg(variables[0])}")
@@ -171,7 +178,7 @@ if __name__ == '__main__':
             optim.variable_history = np.rad2deg(optim.variable_history)
 
         elif args.transform == 'rigid':
-            optim = Adam(eps=1e-2)
+            optim = Adam(eps=1e-3)
 
             p = random.uniform(translation_range[0], translation_range[1])
             q = random.uniform(translation_range[0], translation_range[1])
@@ -180,6 +187,7 @@ if __name__ == '__main__':
 
             I2 = rigid(I, p, q, theta)
             variables, errors = recalage_rigide(I2, I, optim, args.steps)
+            variables = optim.variable_history[np.argmin(errors)]
             I3 = rigid(I2, *tuple(-variables))
 
             print(f"Real values: p={p}, q={q}, theta={np.rad2deg(theta)}")
@@ -197,16 +205,18 @@ if __name__ == '__main__':
         images.append([I, I2, I3])
         test_errors.append(errors)
 
-    figure, axes = plt.subplots(args.num_tests, 3)
+    figure1, axes = plt.subplots(args.num_tests, 4)
     axes[0, 0].set_title("Initial")
     axes[0, 1].set_title("Transformed")
     axes[0, 2].set_title("Registered")
+    axes[0, 3].set_title("Difference")
     for i in range(args.num_tests):
         axes[i - 1, 0].imshow(images[i][0])
         axes[i - 1, 1].imshow(images[i][1])
         axes[i - 1, 2].imshow(images[i][2])
+        axes[i - 1, 3].imshow(images[i][0] - images[i][2])
 
-    figure, axes = plt.subplots(args.num_tests, 2)
+    figure2, axes = plt.subplots(args.num_tests, 2)
     axes[0, 0].set_title("Errors")
     axes[0, 1].set_title("Variables")
     for i in range(args.num_tests):
@@ -219,15 +229,7 @@ if __name__ == '__main__':
         for var in range(len(real_values[i])):
             axes[i, 1].plot([0, args.steps], [real_values[i][var], real_values[i][var]], linestyle='--')
 
-    # plt.figure()
-    # plt.plot(errors)
-    #
-    # fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-    # ax1.imshow(I)
-    # ax1.set_title("Initial")
-    # ax2.imshow(I2)
-    # ax2.set_title("Transformed")
-    # ax3.imshow(I3)
-    # ax3.set_title("Registered")
+    figure1.savefig(f"recalage_{args.transform}_ex.png")
+    figure2.savefig(f"recalage_{args.transform}_curve.png")
 
     plt.show()

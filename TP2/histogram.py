@@ -27,7 +27,7 @@ if __name__ == '__main__':
     print("\n" + bcolors.OKBLUE + "Informations: " + bcolors.ENDC)
     
     num_images = 6
-    figure, axes = plt.subplots(num_images, 3)
+    figure, axes = plt.subplots(num_images, 3, figsize=(4, 8))
 
     for i in range(1, num_images+1):
         try:
@@ -55,20 +55,26 @@ if __name__ == '__main__':
         pretty_print("Correlation:", cr(I, J))
         pretty_print("IM:", mi(I, J, args.bins))
 
-        axes[i-1, 0].imshow(I)
-        axes[i-1, 0].set_title(f"I{i}")
-        axes[i-1, 1].imshow(J)
-        axes[i-1, 1].set_title(f"J{i}")
-        axes[i-1, 2].imshow(hist, origin='lower')
-        axes[i-1, 2].set_title("H")
+        aspect = None
+        if i-1 == 0:
+            axes[i - 1, 0].set_title(f"I")
+            axes[i - 1, 1].set_title(f"J")
+            axes[i - 1, 2].set_title("H")
 
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-        ax1.imshow(I)
-        ax1.set_title(f"I{i}")
-        ax2.imshow(J)
-        ax2.set_title(f"J{i}")
-        ax3.imshow(hist, origin='lower')
-        ax3.set_title("H")
+        axes[i-1, 0].imshow(I, aspect=aspect)
+        axes[i - 1, 0].set_ylabel(f'{i}', rotation=90)
+        axes[i-1, 1].imshow(J, aspect=aspect)
+        plot = axes[i-1, 2].imshow(hist, origin='lower', aspect=aspect)
+        plt.colorbar(plot, ax=axes[i-1, 2])
+
+        axes[i-1, 0].set_xticks([])
+        axes[i-1, 0].set_yticks([])
+
+        axes[i-1, 1].set_xticks([])
+        axes[i-1, 1].set_yticks([])
+
+        axes[i-1, 2].set_xticks([])
+        axes[i-1, 2].set_yticks([])
 
         if args.remove_black:
             sns.set_theme(style="ticks")
@@ -80,4 +86,5 @@ if __name__ == '__main__':
                           marginal_kws=dict(bins=args.bins,
                                             fill=True))
 
+    figure.savefig('histogram.png')
     plt.show()

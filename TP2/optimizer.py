@@ -47,7 +47,7 @@ class GradientDescent(Optimizer):
         return variables
 
     def to_string(self):
-        return f"{self.__class__.__name__}-eps={self.eps}-mom={self.momentum}"
+        return f"GD-eps={self.eps}-mom={self.momentum}"
 
 
 class Adam(Optimizer):

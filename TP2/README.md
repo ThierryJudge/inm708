@@ -54,8 +54,11 @@ $ python transformation2.py 0.5 45 45 45 0 0 0 --transformation similitude
 #### Transformation 
 
 Le fichier ``recalage.py`` implémente les fonctions nécesaire pour le recalage d'une translation, rotation et transformation rigide.
-Il es
+Il est possible de tester le recalage avec ce fichier. 
 
+````
+python recalage.py DataTP2/Data/BrainMRI_1.jpg <type-transformation>
+````
 
 #### Comparaison d'algorithme d'optimisation
 
@@ -63,6 +66,8 @@ Il es
 python compare_optim.py DataTP2/Data/BrainMRI_1.jpg translation --steps=1000 --adam_lr=1e-1 --gd_lr=1e-8 --gd_mom=0.5
 ````
 
+#### Recalage d'IRM
+
 ````
-python compare_optim.py DataTP2/Data/BrainMRI_1.jpg rotation --steps=1000 --adam_lr=1e-1 --gd_lr=1e-8 --gd_mom=0.5
+python brain.py DataTP2/Data/BrainMRI_1.jpg DataTP2/Data/BrainMRI_2.jpg
 ````

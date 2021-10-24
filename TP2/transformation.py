@@ -120,4 +120,5 @@ if __name__ == '__main__':
     ax.set_zlabel('Z Label')
     plt.legend()
 
+    plt.savefig(f'transformation_{args.transformation}')
     plt.show()

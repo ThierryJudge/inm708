@@ -1,9 +1,7 @@
-import numpy as np
 from pathlib import Path
 
-import numpy as np
 import imageio
-from matplotlib import pyplot as plt
+import numpy as np
 
 from histogram import histogram
 
@@ -14,8 +12,7 @@ def ssd(i, j):
 
 def cr(i, j):
     # np.cov returns 2x2 matrix, get second (or third) value to get correlation between i and j
-    # return np.cov(i.ravel(), j.ravel()).ravel()[1] / (np.var(i) * np.var(j))
-    return np.corrcoef(i.ravel(),j.ravel()).ravel()[1]
+    return np.corrcoef(i.ravel(), j.ravel()).ravel()[1]
 
 
 def mi(i, j, bins=100):
@@ -27,9 +24,6 @@ def mi(i, j, bins=100):
 
     indices = hist_norm > 0  # Only consider values that are over 0 to avoid NaN errors with log
     return np.sum(hist_norm[indices] * (np.log(hist_norm[indices]) - np.log(pxpy[indices])))
-
-    # return np.sum(hist_norm * np.log(hist_norm / pxpy))
-
 
 
 if __name__ == '__main__':
@@ -49,6 +43,3 @@ if __name__ == '__main__':
             J = imageio.imread(args.path / f'J{i}.jpg')
 
         print(f'Paire {i}: SSD : {ssd(I, J)}, Corr.: {cr(I, J)}, MI: {mi(I, J, args.bins)}')
-
-
-
