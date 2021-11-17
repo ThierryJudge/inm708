@@ -58,15 +58,27 @@ if __name__ == '__main__':
 
     print("Tensor shape", tensor.shape)
 
-    dtype=np.float32
+    dtype = np.float32
     img = nib.Nifti1Image(D.astype(dtype), file_data.affine, header=file_data.header)
     img.set_data_dtype(dtype)
     nib.save(img, "tensor.nii.gz")
 
     w, v = LA.eig(tensor)
 
-    print(w.shape)
-    print(v.shape)
+    print("Eigenvalues shape: ", w.shape)
+    print("Eigenvector shape: ", v.shape)
+
+    sorted_w = np.sort(w, axis=-1)
+
+    FA = np.sqrt(1 / 2) * np.sqrt((sorted_w[..., 0] - sorted_w[..., 1]) ** 2 +
+                                  (sorted_w[..., 1] - sorted_w[..., 2]) ** 2 +
+                                  (sorted_w[..., 2] - sorted_w[..., 0]) ** 2) / np.sqrt(sorted_w[..., 0] ** 2 +
+                                                                                        sorted_w[..., 1] ** 2 +
+                                                                                        sorted_w[..., 2] ** 2)
+    print(FA.shape)
+
+    img = nib.Nifti1Image(FA, file_data.affine, header=file_data.header)
+    nib.save(img, "fa.nii.gz")
 
     idx = np.argmax(w, axis=-1)
 
