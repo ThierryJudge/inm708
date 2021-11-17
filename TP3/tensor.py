@@ -58,10 +58,20 @@ if __name__ == '__main__':
 
     print("Tensor shape", tensor.shape)
 
-    img = nib.Nifti1Image(D, file_data.affine, header=file_data.header)
+    dtype=np.float32
+    img = nib.Nifti1Image(D.astype(dtype), file_data.affine, header=file_data.header)
+    img.set_data_dtype(dtype)
     nib.save(img, "tensor.nii.gz")
 
     w, v = LA.eig(tensor)
+
+    print(w.shape)
+    print(v.shape)
+
+    idx = np.argmax(w, axis=-1)
+
+    print(idx.shape)
+
     max_idx = w.max(axis=-1)
     w2 = np.equal(w, max_idx[..., None])
     principal = v[w2].reshape((128, 128, 60, 3))  # Get larges eigen vector for each voxel.
