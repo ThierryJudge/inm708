@@ -9,6 +9,20 @@ if __name__ == '__main__':
 
     print(img.shape)
 
+    plt.figure()
+    plt.imshow(img[:, :, 25, 10])
+
+    file_data = nib.load('Data/Tcorr1D.nii')
+    corr = file_data.get_fdata().squeeze()
+
+    print(corr.shape)
+
+    plt.figure()
+    plt.hist(corr.flatten(), bins=50)
+
+    plt.figure()
+    plt.imshow(corr[:, :, 25])
+
     with open('Data/ideal.txt') as f:
         lines = f.readlines()
         values = []
@@ -18,5 +32,6 @@ if __name__ == '__main__':
 
     print(values.shape)
 
+    plt.figure()
     plt.plot(values)
     plt.show()
