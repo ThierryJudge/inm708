@@ -64,19 +64,6 @@ def angle_between(v1, v2):
 
 if __name__ == '__main__':
 
-    # z = np.array([0, 0])
-    # x = np.array([0, 1])
-    # x2 = np.array([0, -1])
-    #
-    # print(angle_between(x, x2))
-    #
-    # plt.figure()
-    # plt.plot(z, x)
-    # plt.plot(z, x2)
-    # plt.show()
-    #
-    # exit(0)
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz')
     parser.add_argument("--wm_mask_path", type=str, default='Data/t1_skullstrip_pve_2.nii.gz')
