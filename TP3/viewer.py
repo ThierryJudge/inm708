@@ -14,7 +14,7 @@ class Viewer:
               'coronal': 'b',
               'axial': 'g'}
 
-    def __init__(self, img, aspect=None, cmap='gray', rotate=True):
+    def __init__(self, img, aspect=None, cmap='magma', rotate=True):
 
         if img.ndim == 2:
             plt.figure()

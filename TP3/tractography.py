@@ -16,13 +16,18 @@ def get_seeds(seeding_mask, nb_seed):
     return possible_seeds[seed_indices]
 
 
-def track_one_direction(initial_seed, principal_directions, wm_mask):
+def track_one_direction(initial_seed, principal_directions, wm_mask, step_size, voxelsize):
     path = []
     last_direction = principal_directions[tuple(initial_seed.round().astype(int))]
-    seed = initial_seed + last_direction
+    last_direction = unit_vector(last_direction, voxel_size=voxelsize)
+    len = np.linalg.norm(last_direction) * step_size
+    seed = initial_seed + last_direction * step_size
     path.append(initial_seed)
-    for i in range(100000):
+    while True:
         current_direction = principal_directions[tuple(seed.round().astype(int))]
+        current_direction = unit_vector(current_direction, voxelsize)
+        len += np.linalg.norm(current_direction) * step_size
+
         angle = angle_between(last_direction, current_direction)
         current_direction = current_direction if angle < 90 else -current_direction
 
@@ -38,18 +43,17 @@ def track_one_direction(initial_seed, principal_directions, wm_mask):
                 print("Left white matter mask")
             break
 
-        seed = seed + current_direction
-
-        seed = seed + current_direction * 2
+        seed = seed + current_direction * step_size
         last_direction = current_direction
         path.append(seed)
 
-    return np.array(path)
+    return np.array(path), len
 
 
-def unit_vector(vector):
+def unit_vector(vector, voxel_size=None):
     """https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python"""
-    return vector / np.linalg.norm(vector)
+    voxel_size = voxel_size or np.ones_like(vector)
+    return vector / np.linalg.norm(vector * voxel_size)
 
 
 def angle_between(v1, v2):
@@ -63,13 +67,14 @@ def angle_between(v1, v2):
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz')
-    parser.add_argument("--wm_mask_path", type=str, default='Data/t1_skullstrip_pve_2.nii.gz')
-    parser.add_argument("--direction_path", type=str, default='principal_dir.nii.gz')
+    parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz', help="Path to the DMRI nifti data")
+    parser.add_argument("--wm_mask_path", type=str, default='Data/t1_skullstrip_pve_2.nii.gz', help='')
+    parser.add_argument("--direction_path", type=str, default='principal_dir.nii.gz', help="")
     parser.add_argument("--nb_seeds", type=int, default=1000, help='Number of seeds')
     parser.add_argument("--random_seed", type=int, default=1234, help='Number of seeds')
+    parser.add_argument("--step_size", type=float, default=0.5, help='Step size in mm')
+    parser.add_argument("--min_length", type=float, default=20, help='Minimum length of streamline in mm')
 
     args = parser.parse_args()
 
@@ -89,22 +94,28 @@ if __name__ == '__main__':
     print("White matter mask shape", wm_mask.shape)
     print("White matter mask voxelsize", wm_mask_data.header.get_zooms())
     print("Principal direction shape", principal_directions.shape)
-    print("Principal direction voxelsize", principal_directions.header.get_zooms())
+    print("Principal direction voxelsize", direction_data.header.get_zooms())
 
     seeds = get_seeds(wm_mask, args.nb_seeds)
     streamlines = []
     filtered_streamlines = []
+    lengths, filtered_lengths = [], []
 
     for i in tqdm(range(len(seeds))):
         initial_seed = seeds[i]
         initial_seed = (initial_seed * principal_directions.shape[:3] / wm_mask.shape).astype(int)
 
-        stream1 = track_one_direction(initial_seed, principal_directions, wm_mask)
-        stream2 = track_one_direction(initial_seed, -principal_directions, wm_mask)
+        stream1, len1 = track_one_direction(initial_seed, principal_directions, wm_mask, args.step_size,
+                                            direction_data.header.get_zooms()[:3])
+        stream2, len2 = track_one_direction(initial_seed, -principal_directions, wm_mask, args.step_size,
+                                            direction_data.header.get_zooms()[:3])
 
         stream = np.vstack((stream1[1:][::-1], stream2))  # ignore point and reverse stream1 and concat with stream2
 
+        length = len1 + len2
+
         if DEBUG:
+            print("Streamline length", length)
             s1 = stream1 * wm_mask.shape / principal_directions.shape[:3]
             s2 = stream2 * wm_mask.shape / principal_directions.shape[:3]
             plt.figure()
@@ -113,12 +124,28 @@ if __name__ == '__main__':
             plt.plot(s2[:, 1], s2[:, 0], c='b')
             plt.show()
 
-        filtered_streamlines.append(stream)
-        if len(stream) > 15:
-            streamlines.append(stream)
+        streamlines.append(stream)
+        lengths.append(length)
+        if length > args.min_length:
+            filtered_streamlines.append(stream)
+            filtered_lengths.append(length)
 
-    print("All streamlines", len(streamlines))
-    print("Filtered streamlines", len(filtered_streamlines))
+    lengths = np.array(lengths)
+    filtered_lengths = np.array(filtered_lengths)
+    print("All streamlines: ", len(streamlines))
+    print("Min length: ", lengths.min())
+    print("Max length: ", lengths.max())
+    print("Mean length: ", lengths.mean())
+    print("Std length: ", lengths.std())
+
+    print("Filtered streamlines: ", len(filtered_streamlines))
+    print("Min length: ", filtered_lengths.min())
+    print("Max length: ", filtered_lengths.max())
+    print("Mean length: ", filtered_lengths.mean())
+    print("Std length: ", filtered_lengths.std())
 
     sft = StatefulTractogram(streamlines, dmri_data, Space.VOX)
     save_tractogram(sft, "tractogram.trk", bbox_valid_check=False)
+
+    sft = StatefulTractogram(filtered_streamlines, dmri_data, Space.VOX)
+    save_tractogram(sft, "filtered_tractogram.trk", bbox_valid_check=False)
