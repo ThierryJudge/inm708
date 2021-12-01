@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from matplotlib.widgets import Slider, RadioButtons, RangeSlider
 from scipy import ndimage
 
-from TP1.utils import *
+from utils import *
 
 
 class Viewer:

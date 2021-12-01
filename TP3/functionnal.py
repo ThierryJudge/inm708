@@ -11,8 +11,6 @@ from scipy.signal import butter, sosfilt
 from viewer import *
 from utils import *
 
-with open("config.yaml", "r") as stream:
-    config = yaml.safe_load(stream)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -27,17 +25,17 @@ if __name__ == "__main__":
     if args.fmri_path:
         fmri = nib.load(args.fmri_path)
     else:
-        fmri = nib.load("TP3/Data/fmri.nii")
+        fmri = nib.load("Data/fmri.nii")
 
     if args.ideal_path:
         ideal = np.loadtxt(args.ideal_path, dtype=float)
     else:
-        ideal = np.loadtxt("TP3/Data/ideal.txt", dtype=float)
+        ideal = np.loadtxt("Data/ideal.txt", dtype=float)
 
     if args.t1_path:
         t1 = nib.load(args.ideal_path)
     else:
-        t1 = nib.load("TP3/Data/t1.nii")
+        t1 = nib.load("Data/t1.nii")
 
     img_fmri = fmri.get_fdata().squeeze()
     img_t1 = t1.get_fdata().squeeze()
@@ -115,16 +113,20 @@ if __name__ == "__main__":
     #                                img_fmri.shape[2],
     #                                1))
 
+    corr_threshold = 3
+
     def corr(a):
         return np.correlate(a, ideal)
 
     corr_values = np.apply_along_axis(corr, 3, img_fmri)
 
-    test = np.copy(corr_values)
-    test[test < 3] = 0
-    #Viewer(test)
+    # --------------------------- 3.2 Segmentation --------------------------- #
 
-    a = np.where(corr_values > 2)
+    test = np.copy(corr_values)
+    test[test < corr_threshold] = 0
+    Viewer(test)
+
+    a = np.where(corr_values > corr_threshold)
     indexes_ = np.zeros((len(a[0]), 3))
     for i in range(len(a)-1):
         indexes_[:, i] = np.array(a[i])

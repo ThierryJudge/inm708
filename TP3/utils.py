@@ -1,7 +1,7 @@
 import scipy
 import numpy as np
-from skimage.filters import median
-from skimage.restoration import denoise_bilateral
+# from skimage.filters import median
+# from skimage.restoration import denoise_bilateral
 import operator
 from dipy.denoise.nlmeans import nlmeans
 from dipy.denoise.noise_estimate import estimate_sigma
