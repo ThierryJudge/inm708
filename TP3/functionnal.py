@@ -1,3 +1,4 @@
+import os
 import yaml
 import argparse
 import numpy as np
@@ -55,6 +56,9 @@ if __name__ == "__main__":
     if args.viewer:
         Viewer(img_fmri[:, :, :, 10])
 
+    new_image = nib.Nifti1Image(img_fmri[:, :, :, 10], affine=np.eye(4))
+    nib.save(new_image, os.path.join('produced_im', 'viz1.nii.gz'))
+
     ###########################################
     #          STEP 2: Preprocessing          #
     ###########################################
@@ -63,7 +67,7 @@ if __name__ == "__main__":
     for i in range(img_fmri.shape[3]):
         s = np.max(img_fmri[..., i])
         img_fmri[..., i] /= s
-    # -------------------------- 2.1 Removing 3 TR -------------------------- #
+    # -------------------- 2.1 Removing 3 TR (slides 43) -------------------- #
     img_fmri = img_fmri[:, :, :, 3:]
     ideal = ideal[3:]
 
@@ -122,9 +126,13 @@ if __name__ == "__main__":
 
     # --------------------------- 3.2 Segmentation --------------------------- #
 
-    test = np.copy(corr_values)
-    test[test < corr_threshold] = 0
-    Viewer(test)
+    segmented = np.copy(corr_values)
+    segmented[segmented < corr_threshold] = 0
+    #Viewer(test)
+
+    new_image = nib.Nifti1Image(segmented, affine=np.eye(4))
+    nib.save(new_image, os.path.join('produced_im', 'frmi_corr.nii.gz'))
+
 
     a = np.where(corr_values > corr_threshold)
     indexes_ = np.zeros((len(a[0]), 3))
