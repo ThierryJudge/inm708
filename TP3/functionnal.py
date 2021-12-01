@@ -125,18 +125,6 @@ if __name__ == "__main__":
 
     corr_values = np.apply_along_axis(corr, 3, img_fmri)
 
-    # corr_values = np.zeros((img_fmri.shape[0],
-    #                         img_fmri.shape[1],
-    #                         img_fmri.shape[2]))
-    #
-    # for i in range(img_fmri.shape[0]):
-    #     for j in range(img_fmri.shape[1]):
-    #         for k in range(img_fmri.shape[2]):
-    #             corr_values[i, j, k] = corr(img_fmri[i, j, k, :])
-
-
-
-
     # --------------------------- 3.2 Segmentation --------------------------- #
 
     corr_values[corr_values < 0.5] = 0
