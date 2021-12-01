@@ -2,11 +2,15 @@ import argparse
 
 import numpy as np
 import nibabel as nib
+from dipy.segment.mask import median_otsu
 from numpy import linalg as LA
+# from matplotlib import pyplot as plt
+from dipy.viz import window, actor, has_fury
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz')
+    parser.add_argument("--dmri_strip_path", type=str, default='Data/dmri_skull.nii.gz')
     parser.add_argument("--grad_path", type=str, default='Data/gradient_directions_b-values.txt')
     args = parser.parse_args()
 
@@ -35,7 +39,10 @@ if __name__ == '__main__':
     S = img[..., 1:]
     S0 = img[..., 0][..., None]  # Add last dimension to broadcast
 
+    _, mask = median_otsu(img[..., 0], median_radius=3, numpass=2)
+
     print("Image shape", img.shape)
+    print("Mask shape", mask.shape)
     print("b-values shape", b_values.shape)
     print("q shape", q.shape)
     print("B matrix shape", B.shape)
@@ -47,6 +54,8 @@ if __name__ == '__main__':
 
     B1 = np.linalg.inv((B.T @ B)) @ B.T
     D = np.dot(B1, X.transpose(0, 1, 3, 2)).transpose(1, 2, 3, 0)
+
+    D[mask == 0, :] = 0
 
     print("D shape", D.shape)
 
@@ -63,30 +72,17 @@ if __name__ == '__main__':
     img.set_data_dtype(dtype)
     nib.save(img, "tensor.nii.gz")
 
-    w, v = LA.eig(tensor)
-
+    w, v = LA.eigh(tensor)  # Assumes symmetric matrix and returns sorted eigen vectors and values.
     print("Eigenvalues shape: ", w.shape)
     print("Eigenvector shape: ", v.shape)
 
-    sorted_w = np.sort(w, axis=-1)
+    # From dipy.dti
+    vals = np.rollaxis(w, -1)
+    fa = np.sqrt(0.5 * ((vals[0] - vals[1]) ** 2 +
+                        (vals[1] - vals[2]) ** 2 +
+                        (vals[2] - vals[0]) ** 2)) / ((vals * vals).sum(0) + 1e-8)
 
-    FA = np.sqrt(1 / 2) * np.sqrt((sorted_w[..., 0] - sorted_w[..., 1]) ** 2 +
-                                  (sorted_w[..., 1] - sorted_w[..., 2]) ** 2 +
-                                  (sorted_w[..., 2] - sorted_w[..., 0]) ** 2) / np.sqrt(sorted_w[..., 0] ** 2 +
-                                                                                        sorted_w[..., 1] ** 2 +
-                                                                                        sorted_w[..., 2] ** 2)
-    print(FA.shape)
-
-    img = nib.Nifti1Image(FA, file_data.affine, header=file_data.header)
-    nib.save(img, "fa.nii.gz")
-
-    idx = np.argmax(w, axis=-1)
-
-    print(idx.shape)
-
-    max_idx = w.max(axis=-1)
-    w2 = np.equal(w, max_idx[..., None])
-    principal = v[w2].reshape((128, 128, 60, 3))  # Get larges eigen vector for each voxel.
+    principal = v[:, :, :, :, -1]
 
     print("Principal direction shape", principal.shape)
 
