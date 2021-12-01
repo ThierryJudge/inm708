@@ -26,7 +26,7 @@ def track_one_direction(initial_seed, principal_directions, wm_mask):
         angle = angle_between(last_direction, current_direction)
         current_direction = current_direction if angle < 90 else -current_direction
 
-        if (45 < angle < 90) or (270 < angle < 315):
+        if 45 < angle < 90:
             if DEBUG:
                 print("Illegal angle")
             break
@@ -44,14 +44,6 @@ def track_one_direction(initial_seed, principal_directions, wm_mask):
         last_direction = current_direction
         path.append(seed)
 
-        ######
-        # p = np.array(path) * wm_mask.shape / principal_directions.shape[:3]
-        # print(p.shape)
-        # plt.figure()
-        # plt.imshow(wm_mask[:, :, p[0, 2].round().astype(int)])
-        # plt.plot(p[:, 1], p[:, 0], c='r')
-        # plt.show()
-
     return np.array(path)
 
 
@@ -61,13 +53,30 @@ def unit_vector(vector):
 
 
 def angle_between(v1, v2):
-    """https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python"""
+    """Returns angle between two vectors. Angle between 0 and 180.
+
+    https://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python
+    """
     v1_u = unit_vector(v1)
     v2_u = unit_vector(v2)
     return np.rad2deg(np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)))
 
 
 if __name__ == '__main__':
+
+    # z = np.array([0, 0])
+    # x = np.array([0, 1])
+    # x2 = np.array([0, -1])
+    #
+    # print(angle_between(x, x2))
+    #
+    # plt.figure()
+    # plt.plot(z, x)
+    # plt.plot(z, x2)
+    # plt.show()
+    #
+    # exit(0)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz')
     parser.add_argument("--wm_mask_path", type=str, default='Data/t1_skullstrip_pve_2.nii.gz')
@@ -90,11 +99,14 @@ if __name__ == '__main__':
     direction_data = nib.load(args.direction_path)
     principal_directions = direction_data.get_fdata().squeeze()
 
-    print("wm_mask shape", wm_mask.shape)
-    print("Direction shape", principal_directions.shape)
+    print("White matter mask shape", wm_mask.shape)
+    print("White matter mask voxelsize", wm_mask_data.header.get_zooms())
+    print("Principal direction shape", principal_directions.shape)
+    print("Principal direction voxelsize", principal_directions.header.get_zooms())
 
     seeds = get_seeds(wm_mask, args.nb_seeds)
     streamlines = []
+    filtered_streamlines = []
 
     for i in tqdm(range(len(seeds))):
         initial_seed = seeds[i]
@@ -105,27 +117,21 @@ if __name__ == '__main__':
 
         stream = np.vstack((stream1[1:][::-1], stream2))  # ignore point and reverse stream1 and concat with stream2
 
-        s1 = stream1 * wm_mask.shape / principal_directions.shape[:3]
-        s2 = stream2 * wm_mask.shape / principal_directions.shape[:3]
+        if DEBUG:
+            s1 = stream1 * wm_mask.shape / principal_directions.shape[:3]
+            s2 = stream2 * wm_mask.shape / principal_directions.shape[:3]
+            plt.figure()
+            plt.imshow(wm_mask[:, :, s1[0, 2].round().astype(int)])
+            plt.plot(s1[:, 1], s1[:, 0], c='r')
+            plt.plot(s2[:, 1], s2[:, 0], c='b')
+            plt.show()
 
-        # plt.figure()
-        # plt.imshow(wm_mask[:, :, s1[0, 2].round().astype(int)])
-        # plt.plot(s1[:, 1], s1[:, 0], c='r')
-        # plt.plot(s2[:, 1], s2[:, 0], c='b')
-        # plt.show()
-
+        filtered_streamlines.append(stream)
         if len(stream) > 15:
-            # stream = np.array(stream) * wm_mask.shape / principal_directions.shape[:3]
-            # print(path.shape)
-            # plt.figure()
-            # plt.imshow(wm_mask[:, :, path[0, 2].round().astype(int)])
-            # plt.scatter(path[:, 1], path[:, 0], c='r', s=5)
-            # plt.show()
-
-            if DEBUG:
-                print("New streamline", len(stream))
             streamlines.append(stream)
 
-    print(len(streamlines))
+    print("All streamlines", len(streamlines))
+    print("Filtered streamlines", len(filtered_streamlines))
+
     sft = StatefulTractogram(streamlines, dmri_data, Space.VOX)
     save_tractogram(sft, "tractogram.trk", bbox_valid_check=False)
