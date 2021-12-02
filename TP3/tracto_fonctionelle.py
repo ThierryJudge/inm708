@@ -29,12 +29,12 @@ if __name__ == '__main__':
         idx = []
         print(i)
         object_idx = np.argwhere(fmri_seg == i)
-        min_x = object_idx[:, 0].min()
-        max_x = object_idx[:, 0].max()
-        min_y = object_idx[:, 1].min()
-        max_y = object_idx[:, 1].max()
-        min_z = object_idx[:, 2].min()
-        max_z = object_idx[:, 2].max()
+        min_x = np.min(object_idx[:, 0])
+        max_x = np.max(object_idx[:, 0])
+        min_y = np.min(object_idx[:, 1])
+        max_y = np.max(object_idx[:, 1])
+        min_z = np.min(object_idx[:, 2])
+        max_z = np.max(object_idx[:, 2])
 
         print(f"X: {min_x}, {max_x}, Y: {min_y}, {max_y}, Z: {min_z}, {max_z}")
 
@@ -48,9 +48,12 @@ if __name__ == '__main__':
 
             # start_point = tractogram.streamlines[j][0] * fmri_seg.shape / dmri_data.shape[:3]
             # end_point = tractogram.streamlines[j][-1] * fmri_seg.shape / dmri_data.shape[:3]
-            # if min_x < start_point[0] < max_x and min_y < start_point[1] < max_y and min_z < start_point[2] < max_z:
-            #         idx.append(j)
-            # if min_x < end_point[0] < max_x and min_y < end_point[1] < max_y and min_z < end_point[2] < max_z:
+            # if min_x < start_point[0] < max_x and\
+            #    min_y < start_point[1] < max_y and\
+            #    min_z < start_point[2] < max_z and\
+            #    min_x < end_point[0] < max_x and\
+            #    min_y < end_point[1] < max_y and\
+            #    min_z < end_point[2] < max_z:
             #     idx.append(j)
 
         # print(idx)
@@ -63,14 +66,14 @@ if __name__ == '__main__':
         print(len(tractogram.streamlines[indices[i]]))
         sft = StatefulTractogram(tractogram.streamlines[indices[i]], dmri_data, Space.VOX)
         save_tractogram(sft, f"tractogram_{i}.trk", bbox_valid_check=False)
-        for j in range(len(indices)):
-            if i != j:
-                print(i, j)
-                intersection = list(set(indices[i]) & set(indices[j]))
-                print(intersection)
-                if len(intersection) > 0:
-                    sft = StatefulTractogram(tractogram.streamlines[intersection], dmri_data, Space.VOX)
-                    save_tractogram(sft, f"tractogram_{i}_{j}.trk", bbox_valid_check=False)
+        # for j in range(len(indices)):
+        #     if i != j:
+        #         print(i, j)
+        #         intersection = list(set(indices[i]) & set(indices[j]))
+        #         print(intersection)
+        #         if len(intersection) > 0:
+        #             sft = StatefulTractogram(tractogram.streamlines[intersection], dmri_data, Space.VOX)
+        #             save_tractogram(sft, f"tractogram_{i}_{j}.trk", bbox_valid_check=False)
 
     # plt.figure()
     # plt.imshow(fmri_seg[:, :, 10])

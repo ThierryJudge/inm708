@@ -18,12 +18,15 @@ from utils import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fmri_path", type=str)
-    parser.add_argument("--ss", type=str, default="histogram")
-    parser.add_argument("--t1_path", type=str)
-    parser.add_argument("--ideal_path", type=str)
-    parser.add_argument('--plot', dest='plot', action='store_true')
-    parser.add_argument('--viewer', dest='viewer', action='store_true')
+    parser.add_argument("--fmri_path", type=str, help='Path to frmi file')
+    parser.add_argument("--ss", type=str, default="histogram",
+                        help='skull stripping type')
+    parser.add_argument("--t1_path", type=str, help='Path to t1 file')
+    parser.add_argument("--ideal_path", type=str, help='Path to ideal file')
+    parser.add_argument('--plot', dest='plot', action='store_true',
+                        help='Plot some element (to debug)')
+    parser.add_argument('--viewer', dest='viewer', action='store_true',
+                        help='Plot some element (to debug)')
     args = parser.parse_args()
 
     if args.fmri_path:
@@ -42,11 +45,6 @@ if __name__ == "__main__":
         t1 = nib.load("Data/t1.nii")
 
     img_fmri = fmri.get_fdata().squeeze()
-    # img_fmri_t0 = img_fmri[..., 10]
-    # new_image = nib.Nifti1Image(img_fmri_t0, affine=fmri.affine, header=fmri.header)
-    # nib.save(new_image, os.path.join('produced_im', 'frmi_t10.nii.gz'))
-
-
     img_t1 = t1.get_fdata().squeeze()
 
     print(f"Image size: {img_fmri.shape}")
@@ -68,39 +66,33 @@ if __name__ == "__main__":
     #          STEP 2: Preprocessing          #
     ###########################################
 
-    # --------------------------- Normalize data ---------------------------- #
-    # for i in range(img_fmri.shape[3]):
-    #     s = np.max(img_fmri[..., i])
-    #     img_fmri[..., i] /= s
     # -------------------- 2.1 Removing 3 TR (slides 43) -------------------- #
     img_fmri = img_fmri[:, :, :, 3:]
     ideal = ideal[3:]
 
     # ------------- 2.2 Skull stripping based on histogram of t1 ------------ #
-    # if args.ss == "histogram":
-    #     img_fmri[img_fmri < 0.1] = 0
+    if args.ss == "histogram":
+        img_fmri[img_fmri < 0.1] = 0
 
     # ----------------- 2.2.bis Skull stripping with Kmeans ----------------- #
-    # if args.ss == "kmeans":
-    #     kmeans = KMeans(n_clusters=3, random_state=0).fit(
-    #         img_fmri.reshape(-1, 1))
-    #
-    #     c1 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 0]
-    #     c2 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 1]
-    #     c3 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 2]
-    #     # print(img_fmri.reshape(-1, 1).squeeze())
-    #
-    #     BM = np.min([np.mean(c1), np.mean(c2), np.mean(c3)])
-    #
-    #     if np.mean(c1) == BM:
-    #         img_fmri[img_fmri < np.mean(c1)] = 0
-    #     elif np.mean(c2) == BM:
-    #         img_fmri[img_fmri < np.mean(c2)] = 0
-    #     else:
-    #         img_fmri[img_fmri < np.mean(c3)] = 0
-    #
-    # print(img_fmri.shape)
-    # print(np.sum(img_fmri))
+    if args.ss == "kmeans":
+        kmeans = KMeans(n_clusters=3, random_state=0).fit(
+            img_fmri.reshape(-1, 1))
+
+        c1 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 0]
+        c2 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 1]
+        c3 = img_fmri.reshape(-1, 1)[kmeans.labels_ == 2]
+        # print(img_fmri.reshape(-1, 1).squeeze())
+
+        BM = np.min([np.mean(c1), np.mean(c2), np.mean(c3)])
+
+        if np.mean(c1) == BM:
+            img_fmri[img_fmri < np.mean(c1)] = 0
+        elif np.mean(c2) == BM:
+            img_fmri[img_fmri < np.mean(c2)] = 0
+        else:
+            img_fmri[img_fmri < np.mean(c3)] = 0
+
 
     # --------------------- 2.3 Check signal for a voxel --------------------- #
     # for i in [10, 20, 30, 40]:
@@ -119,11 +111,6 @@ if __name__ == "__main__":
     ###########################################
 
     # --------- 3.1 Analyse correlation between data and ideal trace --------- #
-
-    # ideal_matrix = np.tile(ideal, (img_fmri.shape[0],
-    #                                img_fmri.shape[1],
-    #                                img_fmri.shape[2],
-    #                                1))
 
     corr_threshold = 0.5
 
@@ -155,27 +142,6 @@ if __name__ == "__main__":
     indexes_ = indexes_[:, :3]
     print(indexes_)
 
-    # !!!!!!!!!!!!!!!!!!! Try increase zone
-    # for ind in indexes_:
-    #     val = corr_values[int(ind[0]), int(ind[1]), int(ind[2])]
-    #     if val != 0:
-    #         corr_values[int(ind[0]), int(ind[1]), int(ind[2])+1] = val
-    #         corr_values[int(ind[0]), int(ind[1])+1, int(ind[2])] = val
-    #         corr_values[int(ind[0]), int(ind[1])+1, int(ind[2])+1] = val
-    #         corr_values[int(ind[0])+1, int(ind[1]), int(ind[2])] = val
-    #         corr_values[int(ind[0])+1, int(ind[1]), int(ind[2])+1] = val
-    #         corr_values[int(ind[0])+1, int(ind[1])+1, int(ind[2])] = val
-    #         corr_values[int(ind[0])+1, int(ind[1])+1, int(ind[2])+1] = val
-    #
-    # a = np.where(corr_values > corr_threshold)
-    # indexes_ = np.zeros((len(a[0]), 4))
-    # for i in range(len(a)):
-    #     indexes_[:, i] = np.array(a[i])
-    # indexes_ = indexes_[:, :3]
-    # print(indexes_)
-
-    # !!!!!!!!!!!!!!!!!!!
-
     # -------------------------- 3.3 Post Processing ------------------------- #
 
     # Attributing each point to a cluster
@@ -192,7 +158,7 @@ if __name__ == "__main__":
     new_image.set_data_dtype(np.uint16)
     nib.save(new_image, os.path.join('produced_im', 'seg2.nii.gz'))
 
-    # !!!!!!!!!!!!!!!!! Try make cube from cluster
+    # ---------------------- Making cube from clusters ---------------------- #
     f_ = np.zeros_like(clust_)
     print(np.unique(clustering.labels_))
     for cluster_i in (np.unique(clustering.labels_)):
