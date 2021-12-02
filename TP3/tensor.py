@@ -1,17 +1,15 @@
 import argparse
 
-import numpy as np
 import nibabel as nib
+import numpy as np
 from dipy.segment.mask import median_otsu
 from numpy import linalg as LA
-# from matplotlib import pyplot as plt
-from dipy.viz import window, actor, has_fury
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz')
-    parser.add_argument("--dmri_strip_path", type=str, default='Data/dmri_skull.nii.gz')
-    parser.add_argument("--grad_path", type=str, default='Data/gradient_directions_b-values.txt')
+    parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz', help="Path to the input dmri file (.nii)")
+    parser.add_argument("--grad_path", type=str, default='Data/gradient_directions_b-values.txt',
+                        help="Path to the input dmri gradient information file (.txt)")
     args = parser.parse_args()
 
     file_data = nib.load(args.dmri_path)
@@ -80,11 +78,17 @@ if __name__ == '__main__':
     vals = np.rollaxis(w, -1)
     fa = np.sqrt(0.5 * ((vals[0] - vals[1]) ** 2 +
                         (vals[1] - vals[2]) ** 2 +
-                        (vals[2] - vals[0]) ** 2)) / ((vals * vals).sum(0) + 1e-8)
+                        (vals[2] - vals[0]) ** 2) / ((vals * vals).sum(0) + 1e-8))
+    img = nib.Nifti1Image(fa, file_data.affine, header=file_data.header)
+    nib.save(img, "fa.nii.gz")
+
+    adc = np.mean(D, axis=-1)
+    adc[mask == 0] = 0
+    img = nib.Nifti1Image(adc, file_data.affine, header=file_data.header)
+    nib.save(img, "adc.nii.gz")
+
 
     principal = v[:, :, :, :, -1]
-
     print("Principal direction shape", principal.shape)
-
     img = nib.Nifti1Image(principal, file_data.affine, header=file_data.header)
     nib.save(img, "principal_dir.nii.gz")
