@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument("--dmri_path", type=str, default='Data/dmri.nii.gz', help="Path to the DMRI nifti data")
     parser.add_argument("--wm_mask_path", type=str, default='Data/t1_skullstrip_pve_2.nii.gz', help='')
     parser.add_argument("--direction_path", type=str, default='principal_dir.nii.gz', help="")
-    parser.add_argument("--nb_seeds", type=int, default=1000, help='Number of seeds')
+    parser.add_argument("--nb_seeds", type=int, default=100000, help='Number of seeds')
     parser.add_argument("--random_seed", type=int, default=1234, help='Number of seeds')
     parser.add_argument("--step_size", type=float, default=0.5, help='Step size in mm')
     parser.add_argument("--min_length", type=float, default=20, help='Minimum length of streamline in mm')
